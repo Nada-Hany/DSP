@@ -55,9 +55,7 @@ def display_graph(error_lbl, old_frame, root):
     if(utils.valid_inputs(entries, error_lbl)):
         old_frame.destroy()
         frame = right_frame(root)
-        # test = tk.Label(frame, text="in graph window")
-        # test.place(x=200,y=300)
-
+        
         # dummy graph
         fig = Figure(figsize=(5, 2), dpi=100)
         plot = fig.add_subplot(1, 1, 1)

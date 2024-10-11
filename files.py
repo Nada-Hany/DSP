@@ -29,6 +29,11 @@ def readStructure(fileName):
 
 def getSignalFromFile(filename):
     # file = getFile(filename)
+    # if file:
+    #     # read the signal
+    # else:
+    #     print("file not found")
+    #     return
     list = readStructure(filename)
     samples = []
     for i in range(4, len(list), 1):

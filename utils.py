@@ -21,7 +21,7 @@ class ReadSignal:
         self.sampleNo = sampleNo
         self.sampleList = sampleList
 
-        
+
 #check if all field are entered by the user
 #TODO -> check for each constraint [fs range and so on]
 def valid_inputs(entries, error_lbl):
@@ -32,8 +32,12 @@ def valid_inputs(entries, error_lbl):
         if not value.get() or (key=="Signal Generator" and value.get()=="choose function"):
             return False
         if(key == "Samples Number"):
-            if not is_int(value):
+            if not is_int(value.get()):
                 return False
+        else:
+            if key != "Signal Generator" and not is_float(value.get()):
+                return False
+
     return True
 
 def is_float(value):
