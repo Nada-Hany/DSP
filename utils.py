@@ -5,7 +5,7 @@ class Button:
         self.name = name
         self.onClick = onClick
 
-class Signal:
+class ConstructedSignal:
      def __init__(self, amp, phase, analog_freq, sampling_freq, sample_no, func):
         self.amp = amp
         self.phase = phase
@@ -13,7 +13,15 @@ class Signal:
         self.sampling_freq = sampling_freq
         self.sample_no = sample_no
         self.func = func
-         
+
+class ReadSignal:
+     def __init__(self, signalType, isPeriodic, sampleNo, sampleList):
+        self.signalType = signalType
+        self.isPeriodic = isPeriodic
+        self.sampleNo = sampleNo
+        self.sampleList = sampleList
+
+        
 #check if all field are entered by the user
 #TODO -> check for each constraint [fs range and so on]
 def valid_inputs(entries, error_lbl):
@@ -23,6 +31,9 @@ def valid_inputs(entries, error_lbl):
         print(value.get())
         if not value.get() or (key=="Signal Generator" and value.get()=="choose function"):
             return False
+        if(key == "Samples Number"):
+            if not is_int(value):
+                return False
     return True
 
 def is_float(value):

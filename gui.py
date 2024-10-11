@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from utils import Button
-from utils import Signal
+from utils import ConstructedSignal
 import utils
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -32,8 +32,8 @@ def sections(root):
     right_frame = tk.Frame(root, width=450, height=500, bg="white", highlightbackground='black', highlightthickness=2)
     right_frame.pack(side="right", fill="both", expand=True)
     right_frame.pack_propagate(False)
-
-    generate_signal_btn = Button(20, 40, "Generate Signal", lambda:to_generate_signal(right_frame))
+    btn_x = 20
+    generate_signal_btn = Button(btn_x, 40, "Generate Signal", lambda:to_generate_signal(right_frame))
     buttons = []
     buttons.append(generate_signal_btn)
     for btn in buttons:
