@@ -1,5 +1,5 @@
 import os 
-from utils import ReadSignal
+from utils import ReadSignal, ConstructedSignal
 
 def getFile(path):
     startDir = "C:/"
@@ -14,6 +14,15 @@ def getFile(path):
     if found:
         return file_path
     return None
+
+
+def writeOnFile(signal:ConstructedSignal, filename='output.txt'):
+    with open("output.txt", "w") as file:
+        file.write(f'{signal.amp}\n')
+        file.write('0\n')
+        file.write(f'{signal.sample_no}\n')
+        for i in range(signal.sample_no):
+            file.write(f'{i} {signal.y_values[i]}\n')
 
 
 def readStructure(fileName):
@@ -39,10 +48,3 @@ def getSignalFromFile(filename):
     for i in range(4, len(list), 1):
         samples.append(list[i])
     return ReadSignal(list[0], list[1], list[2], samples)
-
-
-
-print(getSignalFromFile("signal1.txt").signalType)
-print(getSignalFromFile("signal1.txt").isPeriodic)
-print(getSignalFromFile("signal1.txt").sampleNo)
-print(getSignalFromFile("signal1.txt").sampleList)

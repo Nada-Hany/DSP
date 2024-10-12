@@ -1,3 +1,6 @@
+from tkinter import filedialog
+
+
 class Button:
     def __init__(self, x, y, name, onClick):
         self.x = x
@@ -6,13 +9,14 @@ class Button:
         self.onClick = onClick
 
 class ConstructedSignal:
-     def __init__(self, amp, phase, analog_freq, sampling_freq, sample_no, func):
+     def __init__(self, amp, phase, analog_freq, sampling_freq, sample_no, func, y_values):
         self.amp = amp
         self.phase = phase
         self.analog_freq = analog_freq
         self.sampling_freq = sampling_freq
         self.sample_no = sample_no
         self.func = func
+        self.y_values = y_values
 
 class ReadSignal:
      def __init__(self, signalType, isPeriodic, sampleNo, sampleList):
@@ -28,7 +32,7 @@ def valid_inputs(entries, error_lbl):
     error_lbl.place(x=200, y=700)
     print("display signal btn is pressed")
     for key, value in zip(entries.keys(), entries.values()):
-        print(value.get())
+        # print(value.get())
         if not value.get() or (key=="Signal Generator" and value.get()=="choose function"):
             return False
         if(key == "Samples Number"):
@@ -40,6 +44,18 @@ def valid_inputs(entries, error_lbl):
 
     return True
 
+def get_data(entries):
+    list = []
+    for key, value in zip(entries.keys(), entries.values()):
+        if(key == 'Samples Number'):
+            list.append(int(value.get()))
+        elif key != 'Samples Number' and key != 'Signal Generator':
+            list.append(float(value.get()))
+        else:
+            list.append(value.get())
+    return list
+
+
 def is_float(value):
     try:
         float(value)  
@@ -47,10 +63,28 @@ def is_float(value):
     except ValueError:
         return False  
 
-
 def is_int(value):
     try:
         int(value)  
         return True  
     except ValueError:
         return False  
+    
+
+
+def browse_file():
+    file = filedialog.askopenfilename(
+        title="Select a File",
+        filetypes=[("Text files", "*.txt")]
+    )
+    if file:
+        print(f"Selected file: {file}")
+        return file
+    return None
+
+
+
+
+
+
+    
