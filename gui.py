@@ -31,7 +31,7 @@ def display_read_signal(root):
     if file:
         #TODO display graph and construct signal 
         signal = files.getSignalFromFile(file)
-        fig = Figure(figsize=(5, 4), dpi=100)
+        fig = Figure(figsize=(5, 2.1), dpi=100)
         plot = fig.add_subplot(1, 1, 1)
     
         # Sample data for discrete points
@@ -59,19 +59,34 @@ def display_read_signal(root):
             y.append(y_)
             x.append(x_)
 
-       
+        # drawing y value for each point
         for i in range(len(x)):
              plot.text(x[i], y[i], f'{y[i]}', fontsize=9, ha='right', va='bottom')
+
         plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
         plot.set_xlabel("sample number")
         plot.set_ylabel("value")
-        plot.set_title("Discrete Points Plot")
+        # plot.set_title("Discrete Points Plot")
         # plot.set_ylim(ymax=1.5, ymin=-0.9)
         # Embed the figure into the Tkinter canvas
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
+        # continous ----
+
+        fig = Figure(figsize=(5, 2.1), dpi=100)
+        plot = fig.add_subplot(1, 1, 1)
+
+      
+        plot.plot(x, y)
+
+        canvas = FigureCanvasTkAgg(fig, master=frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
+
+
+        
     print("in read file func")
 
 def to_read_file(rightFrame):
@@ -113,43 +128,44 @@ def display_graph(error_lbl, old_frame, root):
     #valid inputs -> construct signal obj and go to displaying the graphs
     if(utils.valid_inputs(entries, error_lbl)):
         signal_data = utils.get_data(entries) 
-        signal = signals.generate_signal(signal_data)
-        files.writeOnFile(signal)
-        old_frame.destroy()
-        frame = right_frame(root)
+        signal = signals.generate_signal(signal_data, error_lbl)
+        if signal:
+            files.writeOnFile(signal)
+            old_frame.destroy()
+            frame = right_frame(root)
 
 
 
-        # dummy graph
-        fig = Figure(figsize=(5, 2), dpi=100)
-        plot = fig.add_subplot(1, 1, 1)
-        # Sample data for discrete points
-        y = signal.y_values
-        x = [i for i in range(0, len(y))]
+            # dummy graph
+            fig = Figure(figsize=(5, 2), dpi=100)
+            plot = fig.add_subplot(1, 1, 1)
+            # Sample data for discrete points
+            y = signal.y_values
+            x = [i for i in range(0, len(y))]
 
-        plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
-        plot.set_xlabel("X-axis")
-        plot.set_ylabel("Y-axis")
-        plot.set_title("Discrete Points Plot")
+            plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
+            plot.set_xlabel("X-axis")
+            plot.set_ylabel("Y-axis")
+            plot.set_title("Discrete Points Plot")
 
-        # Embed the figure into the Tkinter canvas
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+            # Embed the figure into the Tkinter canvas
+            canvas = FigureCanvasTkAgg(fig, master=frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        fig = Figure(figsize=(5, 2), dpi=100)
-        plot = fig.add_subplot(1, 1, 1)
+            fig = Figure(figsize=(5, 2), dpi=100)
+            plot = fig.add_subplot(1, 1, 1)
 
-        if signal.func =='Sine':
-            plot.plot(x, np.sin(x))  
-        else:
-            plot.plot(x, np.cos(x))  
-            
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
+            if signal.func =='Sine':
+                plot.plot(x, np.sin(x))  
+            else:
+                plot.plot(x, np.cos(x))  
 
-        print("in display graphs")
+            canvas = FigureCanvasTkAgg(fig, master=frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
+
+            print("in display graphs")
     else:
         error_lbl.place(x=200, y=300)
 
@@ -160,7 +176,6 @@ def generate_signal_input(root):
     #label for trigerring errors 
     error_label = tk.Label(frame, text="enter a valid input")
     # error_label.place(x=200,y=300)
-
     for i, (text, pos) in enumerate(zip(labels_text, positions)):
         label = tk.Label(frame, text=text.lower(), bg="#d3d3d3")
         label.place(x=pos[0], y=pos[1])
