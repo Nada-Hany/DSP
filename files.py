@@ -18,11 +18,12 @@ def getFile(path):
 
 def writeOnFile(signal:ConstructedSignal, filename='output.txt'):
     with open(f"{filename}", "w") as file:
-        file.write(f'{signal.amp}\n')
+        file.write('0\n')
         file.write('0\n')
         file.write(f'{signal.sample_no}\n')
         for i in range(signal.sample_no):
-            file.write(f'{i} {signal.y_values[i]}\n')
+            tmp = round(signal.y_values[i], 6)
+            file.write(f'{i} {tmp}\n')
 
 # sample aplitude -> 1st row = 0
 

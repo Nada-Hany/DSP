@@ -32,6 +32,11 @@ def SignalSamplesAreEqual(file_name,indices,samples):
             return
     print("Test case passed successfully")
 
-
-signal = files.getSignalFromFile_2('signal1.txt')
-print(signal.isPeriodic)
+signal = files.getSignalFromFile_2('SinOutput.txt')
+# print(signal.sampleList)
+ind = [i for i in range(0, len(signal.sampleList))]
+# print(ind)
+samples = []
+for i in range(len(signal.sampleList)):
+    samples.append(float(signal.sampleList[i]))
+SignalSamplesAreEqual('sin_output.txt',ind, samples )
