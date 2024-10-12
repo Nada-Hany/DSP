@@ -1,3 +1,5 @@
+import files
+
 def SignalSamplesAreEqual(file_name,indices,samples):
     expected_indices=[]
     expected_samples=[]
@@ -29,3 +31,7 @@ def SignalSamplesAreEqual(file_name,indices,samples):
             print("Test case failed, your signal have different values from the expected one") 
             return
     print("Test case passed successfully")
+
+
+signal = files.getSignalFromFile_2('signal1.txt')
+print(signal.isPeriodic)

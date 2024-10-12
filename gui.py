@@ -1,11 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
+
 from utils import Button
 from utils import ConstructedSignal
 import utils, signals, files
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+from scipy.interpolate import  make_interp_spline
+
 
 # Input Labels and Fields
 labels_text = ["Amplitude", "Phase Shift", "Analog Frequency", "Sampling Frequency", "Samples Number", "Signal Generator"]
@@ -33,54 +36,35 @@ def display_read_signal(root):
         signal = files.getSignalFromFile(file)
         fig = Figure(figsize=(5, 2.1), dpi=100)
         plot = fig.add_subplot(1, 1, 1)
-    
+
         # Sample data for discrete points
-        y = signal.sampleList
+        y = [float(i) for i in signal.sampleList]
         x = [i for i in range(0, len(y))]
-        list = []
-
-        for i in range(len(y)):
-            list.append([float(i), float(y[i])])
-
-
-        positive_second = [inner for inner in list if float(inner[1]) > 0]
-        non_positive_second = [inner for inner in list if float(inner[1]) <= 0]
-
-        non_positive_second.sort( key=lambda x: x[1])
-        positive_second.sort( key=lambda x: x[1])
-        # non_positive_second = sorted(non_positive_second, key=lambda x: x[1])
-        # positive_second = sorted(positive_second, key=lambda x: x[1])
-        x = []
-        y = []
-        for x_, y_ in non_positive_second:
-            y.append(y_)
-            x.append(x_)
-        for x_, y_ in positive_second:
-            y.append(y_)
-            x.append(x_)
-
+        
         # drawing y value for each point
         for i in range(len(x)):
-             plot.text(x[i], y[i], f'{y[i]}', fontsize=9, ha='right', va='bottom')
+            # plot.text(x[i], y[i], f'{y[i]}', fontsize=9, ha='right', va='bottom')
+            plot.plot([i, i], [0, y[i]], 'b-') 
 
         plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
-        plot.set_xlabel("sample number")
-        plot.set_ylabel("value")
-        # plot.set_title("Discrete Points Plot")
-        # plot.set_ylim(ymax=1.5, ymin=-0.9)
-        # Embed the figure into the Tkinter canvas
+        plot.grid(True)
+        
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # continous ----
-
         fig = Figure(figsize=(5, 2.1), dpi=100)
         plot = fig.add_subplot(1, 1, 1)
 
-      
-        plot.plot(x, y)
+        
+        x_y_Spline = make_interp_spline(x=x, y=y)
+        x_quad = np.linspace(min(x), max(x), 500)
+        y_quad = x_y_Spline(x_quad)
 
+
+        plot.plot(x_quad, y_quad)
+        plot.grid(True)
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
@@ -128,38 +112,38 @@ def display_graph(error_lbl, old_frame, root):
     #valid inputs -> construct signal obj and go to displaying the graphs
     if(utils.valid_inputs(entries, error_lbl)):
         signal_data = utils.get_data(entries) 
-        signal = signals.generate_signal(signal_data, error_lbl)
+        signal, time = signals.generate_signal(signal_data, error_lbl)
         if signal:
-            files.writeOnFile(signal)
+            print(signal.func)
+            if signal.func=='Sine':
+                files.writeOnFile(signal, 'sin_output.txt')
+            else:
+                files.writeOnFile(signal, 'cos_output.txt')
+
             old_frame.destroy()
             frame = right_frame(root)
-
-
-
-            # dummy graph
+  
             fig = Figure(figsize=(5, 2), dpi=100)
             plot = fig.add_subplot(1, 1, 1)
-            # Sample data for discrete points
-            y = signal.y_values
-            x = [i for i in range(0, len(y))]
-
-            plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
-            plot.set_xlabel("X-axis")
-            plot.set_ylabel("Y-axis")
-            plot.set_title("Discrete Points Plot")
-
+    
+            plot.scatter(time, signal.y_values, color="blue", marker="x")  # Discrete points with circular markers
+            plot.set_xlabel("time")
+            plot.set_ylabel("signal")
+            plot.grid(True)
+            # plot.set_xlim(0, 1)
             # Embed the figure into the Tkinter canvas
             canvas = FigureCanvasTkAgg(fig, master=frame)
             canvas.draw()
             canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
+            x_y_Spline = make_interp_spline(x=time, y=signal.y_values)
+            x_quad = np.linspace(time.min(), time.max(), 500)
+            y_quad = x_y_Spline(x_quad)
+
             fig = Figure(figsize=(5, 2), dpi=100)
             plot = fig.add_subplot(1, 1, 1)
-
-            if signal.func =='Sine':
-                plot.plot(x, np.sin(x))  
-            else:
-                plot.plot(x, np.cos(x))  
+            plot.grid(True)
+            plot.plot(x_quad, y_quad)  
 
             canvas = FigureCanvasTkAgg(fig, master=frame)
             canvas.draw()

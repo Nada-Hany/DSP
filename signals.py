@@ -13,7 +13,7 @@ def generate_signal(data, error_label):
         return None
         # raise ValueError("Sampling frequency must be at least twice the analog frequency to satisfy the Nyquist theorem.")
     t = [i / data[3] for i in range(data[4])]
-
+    t =  np.arange(0,data[4], 1) / data[3]
     signal = []
 
     if data[5] == "Sine":
@@ -23,5 +23,5 @@ def generate_signal(data, error_label):
     elif data[5] == "Cosine":
 
         signal = [data[0]  * math.cos(2 * math.pi * data[2] * ti + data[1]) for ti in t]
-
-    return utils.ConstructedSignal(data[0] , data[1], data[2], data[3], data[4],data[5], signal)
+    print(t, "  ----- times")
+    return utils.ConstructedSignal(data[0] , data[1], data[2], data[3], data[4],data[5], signal), t
