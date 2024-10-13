@@ -11,14 +11,14 @@ from scipy.interpolate import  make_interp_spline
 
 
 # Input Labels and Fields
-labels_text = ["Amplitude", "Phase Shift", "Analog Frequency", "Sampling Frequency", "Samples Number", "Signal Generator"]
+labels_text = ["Amplitude", "Phase Shift", "Analog Frequency", "Sampling Frequency", "Signal Generator"]
 entries = {}
 
 # Place labels and entries
 positions = [
     (60, 50), (300, 50),  # Row 1
     (60, 120), (300, 120),  # Row 2
-    (60, 200), (300, 200) # Row 3
+    (60, 200) # Row 3
 ]
 
 
@@ -65,6 +65,9 @@ def display_read_signal(root):
 
         plot.plot(x_quad, y_quad)
         plot.grid(True)
+        plot.set_xlabel("time")
+        plot.set_ylabel("signal")
+        
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
@@ -144,6 +147,8 @@ def display_graph(error_lbl, old_frame, root):
             plot = fig.add_subplot(1, 1, 1)
             plot.grid(True)
             plot.plot(x_quad, y_quad)  
+            plot.set_xlabel("time")
+            plot.set_ylabel("signal")
 
             canvas = FigureCanvasTkAgg(fig, master=frame)
             canvas.draw()

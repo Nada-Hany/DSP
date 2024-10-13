@@ -35,21 +35,17 @@ def valid_inputs(entries, error_lbl):
         # print(value.get())
         if not value.get() or (key=="Signal Generator" and value.get()=="choose function"):
             return False
-        if(key == "Samples Number"):
-            if not is_int(value.get()):
-                return False
-        else:
-            if key != "Signal Generator" and not is_float(value.get()):
-                return False
+        if key != "Signal Generator" and not is_float(value.get()):
+            return False
 
     return True
 
+
+# ["Amplitude", "Phase Shift", "Analog Frequency", "Sampling Frequency", "Signal Generator"]
 def get_data(entries):
     list = []
     for key, value in zip(entries.keys(), entries.values()):
-        if(key == 'Samples Number'):
-            list.append(int(value.get()))
-        elif key != 'Samples Number' and key != 'Signal Generator':
+        if key != 'Signal Generator':
             list.append(float(value.get()))
         else:
             list.append(value.get())
