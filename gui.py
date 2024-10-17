@@ -117,6 +117,7 @@ def display_graph(error_lbl, old_frame, root):
         signal_data = utils.get_data(entries) 
         signal, time = signals.generate_signal(signal_data, error_lbl)
         if signal:
+            x_samples = [i for i in range(len(signal.y_values))]
             print(signal.func)
             if signal.func=='Sine':
                 files.writeOnFile(signal, 'sin_output.txt')
@@ -129,18 +130,18 @@ def display_graph(error_lbl, old_frame, root):
             fig = Figure(figsize=(5, 2), dpi=100)
             plot = fig.add_subplot(1, 1, 1)
     
-            plot.scatter(time, signal.y_values, color="blue", marker="x")  # Discrete points with circular markers
+            plot.scatter(x_samples, signal.y_values, color="blue", marker="x")  # Discrete points with circular markers
             plot.set_xlabel("time")
             plot.set_ylabel("signal")
             plot.grid(True)
             # plot.set_xlim(0, 1)
-            # Embed the figure into the Tkinter canvas
+            # attach the figure into the Tkinter canvas
             canvas = FigureCanvasTkAgg(fig, master=frame)
             canvas.draw()
             canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
             x_y_Spline = make_interp_spline(x=time, y=signal.y_values)
-            x_quad = np.linspace(time.min(), time.max(), 500)
+            x_quad = np.linspace(min(x_samples), max(x_samples), 500)
             y_quad = x_y_Spline(x_quad)
 
             fig = Figure(figsize=(5, 2), dpi=100)

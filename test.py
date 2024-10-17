@@ -1,5 +1,7 @@
 import files
 
+staticPath = './files/task1/'
+
 def SignalSamplesAreEqual(file_name,indices,samples):
     expected_indices=[]
     expected_samples=[]
@@ -32,7 +34,7 @@ def SignalSamplesAreEqual(file_name,indices,samples):
             return
     print("Test case passed successfully")
 
-signal = files.getSignalFromFile_2('CosOutput.txt')
+signal = files.getSignalFromFile_2(f'{staticPath}CosOutput.txt')
 # print(signal.sampleList)
 ind = [i for i in range(0, len(signal.sampleList))]
 # print(ind)
@@ -40,4 +42,4 @@ samples = []
 for i in range(len(signal.sampleList)):
     samples.append(float(signal.sampleList[i]))
 
-SignalSamplesAreEqual('cos_output.txt',ind, samples)
+SignalSamplesAreEqual(f'{staticPath}cos_output.txt',ind, samples)
