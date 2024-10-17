@@ -34,41 +34,6 @@ def writeOnFile(signal:ConstructedSignal, filename='output.txt'):
 # case Time domain was specified in the first row in the file,
 # or N1 rows follow with frequency followed by space followed by amplitude followed by Phase shift
 
-def readStructure_2(fileName):
-    list = []
-    file = open(fileName, "r")
-    for line in file:
-        tmp = line.strip().split()
-        if len(tmp) == 1:
-            list.append(tmp[0])
-        elif len(tmp) == 2:
-            list.append(tmp[1])
-        else:
-            list.append((tmp[0], tmp[1], tmp[2]))
-
-    return list
-
-def getSignalFromFile_2(filename):
-    # file = getFile(filename)
-    # if file:
-    #     # read the signal
-    # else:
-    #     print("file not found")
-    #     return
-    list = readStructure_2(filename)
-    samples = []
-    if list[0] == '0':
-        for i in range(3, len(list), 1):
-            samples.append(list[i])
-        return ReadSignal(list[0], list[1], list[2], samples)
-    else:
-        for i in range(3, len(list), 1):
-            samples.append([list[i][0],list[i][1], list[i][2]])
-        return None
-
-
-
-
 def readStructure(fileName):
     list = []
     file = open(fileName, "r")
@@ -76,19 +41,24 @@ def readStructure(fileName):
         tmp = line.strip().split()
         if len(tmp) == 1:
             list.append(tmp[0])
+        elif len(tmp) == 2:
+            list.append([tmp[0],tmp[1]])
         else:
-            list.append(tmp[1])
+            list.append((tmp[0], tmp[1], tmp[2]))
+
     return list
 
 def getSignalFromFile(filename):
-    # file = getFile(filename)
-    # if file:
-    #     # read the signal
-    # else:
-    #     print("file not found")
-    #     return
     list = readStructure(filename)
     samples = []
-    for i in range(3, len(list), 1):
-        samples.append(list[i])
-    return ReadSignal(list[0], list[1], list[2], samples)
+    x = []
+    if list[0] == '0':
+        for i in range(3, len(list), 1):
+            samples.append(list[i][1])
+            x.append(list[i][0])
+        return ReadSignal(list[0], list[1], list[2], samples, x)
+    else:
+        for i in range(3, len(list), 1):
+            samples.append([list[i][0],list[i][1], list[i][2]])
+        return None
+

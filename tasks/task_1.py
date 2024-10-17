@@ -7,6 +7,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from scipy.interpolate import  make_interp_spline
+import guiHelpers
+
 
 # Input Labels and Fields
 labels_text = ["Amplitude", "Phase Shift", "Analog Frequency", "Sampling Frequency", "Signal Generator"]
@@ -24,22 +26,22 @@ class Task1:
 
     def __init__(self, root, main):
         self.root =root
-        self.left_section, self.right_section = self.sections(root)
-        self.generate_frame = self.right_frame(self.right_section)
-        self.read_frame = self.right_frame(self.right_section)
+        self.left_section, self.right_section = self.sections()
+        self.generate_frame = guiHelpers.right_frame(self.right_section)
+        self.read_frame = guiHelpers.right_frame(self.right_section)
         self.main = main
-        # self.generate_signal_input(self.right_frame)    
+        # self.generate_signal_input(guiHelpers.right_frame)    
       
     def to_generate_signal(self, rightFrame):
         rightFrame.destroy()
-        self.generate_frame = self.right_frame(self.right_section)
+        self.generate_frame = guiHelpers.right_frame(self.right_section)
         self.generate_signal_input(self.generate_frame)
         print("to_generate_signal btn triggered")
 
     def display_read_signal(self, oldFrame):
         file  = utils.browse_file()
         oldFrame.destroy()
-        self.read_frame = self.right_frame(self.right_section)
+        self.read_frame = guiHelpers.right_frame(self.right_section)
         if file:
             #TODO display graph and construct signal 
             signal = files.getSignalFromFile(file)
@@ -47,8 +49,8 @@ class Task1:
             plot = fig.add_subplot(1, 1, 1)
 
             # Sample data for discrete points
-            y = [float(i) for i in signal.sampleList]
-            x = [i for i in range(0, len(y))]
+            y = [float(i) for i in signal.y]
+            x = [float(i) for i in signal.x]
             
             # drawing y value for each point
             for i in range(len(x)):
@@ -87,37 +89,24 @@ class Task1:
 
     def to_read_file(self, rightFrame):
         rightFrame.destroy()
-        self.read_frame = self.right_frame(self.right_section)
+        self.read_frame = guiHelpers.right_frame(self.right_section)
         get_file = tk.Button(self.read_frame, text="Select File", bg="#808080", fg="white", width=15, height=2, command=lambda: self.display_read_signal(self.generate_frame))
         get_file.place(x=380, y=400)
         print("in read file func")
 
     def goBack(self):
-        import main
-
         print("in go back func")
-        self.generate_frame.destroy()
-        self.read_frame.destroy()
-        self.right_section.destroy()
-        self.left_section.destroy()
-        # main.main_window()
-        self.main.main_window()
-        del self
+        guiHelpers.goBack(self.left_section, self.right_section,self.generate_frame,self.read_frame,  self.main, self)
 
     #left section for all buttons - right section for displaying 
-    def sections(self, root):
-        left_frame = tk.Frame(root, width=150, height=500, bg="#d3d3d3")
-        left_frame.pack(side="left", fill="y")
-        left_frame.pack_propagate(False)
+    def sections(self):
+        left_frame, right_frame = guiHelpers.sections(self.root)
 
-        image_button = tk.Button(left_frame, text="back",compound=tk.CENTER, command= lambda:self.goBack(), width=3, height=1, borderwidth=0)
-        image_button.place(x= 20, y=450)
+        btn_x = guiHelpers.btn_x
+
+        back_btn = tk.Button(left_frame, text="back",compound=tk.CENTER, command= lambda:self.goBack(), width=3, height=1, borderwidth=0)
+        back_btn.place(x= btn_x, y=guiHelpers.back_btn_y)
         
-        right_frame = tk.Frame(root, width=450, height=500, bg="white")
-        right_frame.pack(side="right", fill="both", expand=True)
-        right_frame.pack_propagate(False)
-
-        btn_x = 20
         generate_signal_btn = Button(btn_x, 40, "Generate Signal", lambda:self.to_generate_signal(self.read_frame))
         read_file_btn = Button(btn_x, 120, "Read File", lambda:self.to_read_file(self.generate_frame))
         buttons = []
@@ -132,14 +121,14 @@ class Task1:
 
 
 
-    def right_frame(self, root):
-        frame = tk.Frame(root, width=520, height=480, bg="#d3d3d3")  # Darker frame color
-        frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the frame
-        return frame
+    # def right_frame(self, root):
+    #     frame = tk.Frame(root, width=520, height=480, bg="#d3d3d3")  # Darker frame color
+    #     frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the frame
+    #     return frame
 
     def display_graph(self, error_lbl, old_frame, root):
         error_lbl.place(x=900, y=300)
-        #valid inputs -> construct signal obj and go to displaying the graphs
+        #valid inputs -> construct signal `obj and go to displaying the graphs
         if(utils.valid_inputs(entries, error_lbl)):
             signal_data = utils.get_data(entries) 
             signal, time = signals.generate_signal(signal_data, error_lbl)
@@ -147,12 +136,12 @@ class Task1:
                 x_samples = [i for i in range(len(signal.y_values))]
                 print(signal.func)
                 if signal.func=='Sine':
-                    files.writeOnFile(signal, 'sin_output.txt')
+                    files.writeOnFile(signal, './files/task1/sin_output.txt')
                 else:
-                    files.writeOnFile(signal, 'cos_output.txt')
+                    files.writeOnFile(signal, './files/task1/cos_output.txt')
 
                 old_frame.destroy()
-                self.generate_frame = self.right_frame(self.right_section)
+                self.generate_frame = guiHelpers.right_frame(self.right_section)
     
                 fig = Figure(figsize=(5, 2), dpi=100)
                 plot = fig.add_subplot(1, 1, 1)
@@ -189,7 +178,7 @@ class Task1:
 
     def generate_signal_input(self, root):
         
-        frame = self.right_frame(root)
+        frame = guiHelpers.right_frame(root)
         #label for trigerring errors 
         error_label = tk.Label(frame, text="enter a valid input")
         # error_label.place(x=200,y=300)

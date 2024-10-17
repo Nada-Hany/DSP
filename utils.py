@@ -19,11 +19,12 @@ class ConstructedSignal:
         self.y_values = y_values
 
 class ReadSignal:
-     def __init__(self, signalType, isPeriodic, sampleNo, sampleList):
+     def __init__(self, signalType, isPeriodic, sampleNo, y, x):
         self.signalType = signalType
         self.isPeriodic = isPeriodic
         self.sampleNo = sampleNo
-        self.sampleList = sampleList
+        self.y = y
+        self.x = x
 
 
 #check if all field are entered by the user
