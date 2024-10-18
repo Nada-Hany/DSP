@@ -3,7 +3,7 @@ import tkinter as tk
 from utils import Button
 import utils, files
 from tkinter import ttk
-
+import numpy as np
 
 staticPath= './files/task2/'
 
@@ -30,9 +30,21 @@ class Task2:
         self.normalization_frame.destroy()
         self.accumulation_frame.destroy()
 
+   
     def goBack(self):
+
         print("in go back func")
-        guiHelpers.goBack(self.left_section, self.right_section,self.generate_frame,self.read_frame,  self.main, self)
+        self.add_signals_frame.destroy()
+        self.subtract_signals_frame.destroy()
+        self.multiply_signals_frame.destroy()
+        self.square_signals_frame.destroy()
+        self.normalization_frame.destroy()
+        self.square_signals_frame.destroy()
+        self.right_section.destroy()
+        self.left_section.destroy()
+        # main.main_window()
+        self.main.main_window()
+        del self
 
 
     #left section for all buttons - right section for displaying 
@@ -72,25 +84,50 @@ class Task2:
 
     def to_add_signals(self):
         print("in add signals")
+        self.destroyFrames()
+        self.accumulation_frame = guiHelpers.right_frame(self.add_signals_frame)
     
     def to_subtract_signals(self):
         print("in subtract signals")
+        self.destroyFrames()
+        self.accumulation_frame = guiHelpers.right_frame(self.subtract_signals_frame)
     
     def to_multiply_signals(self):
         print("in multiply signals")
+        self.destroyFrames()
+        self.accumulation_frame = guiHelpers.right_frame(self.multiply_signals_frame)
     
     def to_square_signals(self):
         print("in square signals")
+        self.destroyFrames()
+        self.accumulation_frame = guiHelpers.right_frame(self.square_signals_frame)
     
     def to_normalization(self):
         print("in normalization")
     
         self.destroyFrames()
         self.normalization_frame = guiHelpers.right_frame(self.right_section)
-    
+        noSignalError = tk.Label(self.right_section, text="please read a signal first")
+        # range of normalization [-1,1]
+        new_min, new_max = -1, 1
+        signal = self.signal_1 or self.signal_2
+        if signal:
+            noSignalError.destroy()
+            y_min, y_max = np.min(signal.y), np.max(signal.y)
+            signal.y = (signal.y - y_min) / (y_max - y_min) * (new_max - new_min) + new_min
+
+            signal.x = np.arange(1, len(signal.y) + 1)
+
+            guiHelpers.discreteGraph(self.normalization_frame, 'top', signal)
+            guiHelpers.continousGraph(self.normalization_frame, 'top', signal)
+
+            files.writeOnFile_read(signal, f"{staticPath}normalization.txt")
+
+        else:
+            noSignalError.place(x=200,y=200)
+            
     def to_accumulation(self):
-        print("in accumulation signals")
-    
+
         self.destroyFrames()
         self.accumulation_frame = guiHelpers.right_frame(self.right_section)
         noSignalError = tk.Label(self.right_section, text="please read a signal first")
@@ -124,8 +161,3 @@ class Task2:
         print("in read signal 2")
         file = utils.browse_file()
         self.signal_2 = files.getSignalFromFile(file)
-        # print(self.signal_2.isPeriodic)
-        # print(self.signal_2.sampleList)
-        # print(self.signal_2.sampleNo)
-        # print(self.signal_2.signalType)
-   

@@ -24,19 +24,6 @@ def sections(root):
        
         return  left_frame, right_frame
     
-
-def goBack(left_section, right_section,generate_frame, read_frame, main, self):
-
-    print("in go back func")
-    generate_frame.destroy()
-    read_frame.destroy()
-    right_section.destroy()
-    left_section.destroy()
-    # main.main_window()
-    main.main_window()
-    del self
-
-
 places = {
      "top": tk.TOP,
      "bottom":tk.BOTTOM
@@ -63,7 +50,7 @@ def discreteGraph(root, place, signal_1, signal_2 = None):
 
 
 def continousGraph(root, place, signal_1, signal_2 = None):
-    
+
     x_y_Spline = make_interp_spline(x=signal_1.x, y=signal_1.y)
     x_quad = np.linspace(min(signal_1.x), max(signal_1.x), 500)
     y_quad = x_y_Spline(x_quad)

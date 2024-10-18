@@ -59,9 +59,6 @@ class Task1:
         get_file.place(x=380, y=400)
         print("in read file func")
 
-    def goBack(self):
-        print("in go back func")
-        guiHelpers.goBack(self.left_section, self.right_section,self.generate_frame,self.read_frame,  self.main, self)
 
     #left section for all buttons - right section for displaying 
     def sections(self):
@@ -134,4 +131,13 @@ class Task1:
         display_button = tk.Button(frame, text="Display Signal", bg="#808080", fg="white", width=15, height=2, command=lambda:self.display_graph(error_label, frame, root))
         display_button.place(x=380, y=400)
 
-   
+    def goBack(self):
+
+        print("in go back func")
+        self.generate_frame.destroy()
+        self.read_frame.destroy()
+        self.right_section.destroy()
+        self.left_section.destroy()
+        # main.main_window()
+        self.main.main_window()
+        del self
