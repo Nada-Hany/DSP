@@ -9,22 +9,23 @@ class Button:
         self.onClick = onClick
 
 class ConstructedSignal:
-     def __init__(self, amp, phase, analog_freq, sampling_freq, sample_no, func, y_values):
-        self.amp = amp
-        self.phase = phase
-        self.analog_freq = analog_freq
-        self.sampling_freq = sampling_freq
-        self.sample_no = sample_no
+     def __init__(self, amp, phase, analog_freq, sampling_freq, sample_no, func, y):
+        self.amp = float(amp)
+        self.phase = float(phase)
+        self.analog_freq = float(analog_freq)
+        self.sampling_freq = float(sampling_freq)
+        self.sample_no = int(sample_no)
         self.func = func
-        self.y_values = y_values
+        self.y = [i for i in y]
+        self.x = [i for i in sample_no]
 
 class ReadSignal:
      def __init__(self, signalType, isPeriodic, sampleNo, y, x):
         self.signalType = signalType
         self.isPeriodic = isPeriodic
-        self.sampleNo = sampleNo
-        self.y = y
-        self.x = x
+        self.sampleNo = int(sampleNo)
+        self.y = [float(i) for i in y]
+        self.x = [float(i) for i in x]
 
 
 #check if all field are entered by the user

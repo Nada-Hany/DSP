@@ -45,45 +45,10 @@ class Task1:
         if file:
             #TODO display graph and construct signal 
             signal = files.getSignalFromFile(file)
-            fig = Figure(figsize=(5, 2.1), dpi=100)
-            plot = fig.add_subplot(1, 1, 1)
 
-            # Sample data for discrete points
-            y = [float(i) for i in signal.y]
-            x = [float(i) for i in signal.x]
-            
-            # drawing y value for each point
-            for i in range(len(x)):
-                # plot.text(x[i], y[i], f'{y[i]}', fontsize=9, ha='right', va='bottom')
-                plot.plot([i, i], [0, y[i]], 'b-') 
+            guiHelpers.discreteGraph(self.read_frame, "top", signal)
 
-            plot.scatter(x, y, color="blue", marker="x")  # Discrete points with circular markers
-            plot.grid(True)
-            
-            canvas = FigureCanvasTkAgg(fig, master=self.read_frame)
-            canvas.draw()
-            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-            # continous ----
-            fig = Figure(figsize=(5, 2.1), dpi=100)
-            plot = fig.add_subplot(1, 1, 1)
-
-            
-            x_y_Spline = make_interp_spline(x=x, y=y)
-            x_quad = np.linspace(min(x), max(x), 500)
-            y_quad = x_y_Spline(x_quad)
-
-
-            plot.plot(x_quad, y_quad)
-            plot.grid(True)
-            plot.set_xlabel("time")
-            plot.set_ylabel("signal")
-            
-            canvas = FigureCanvasTkAgg(fig, master=self.read_frame)
-            canvas.draw()
-            canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
-
-
+            guiHelpers.continousGraph(self.read_frame, "top", signal)
             
         print("in read file func")
 
@@ -119,13 +84,6 @@ class Task1:
         return  left_frame, right_frame
     
 
-
-
-    # def right_frame(self, root):
-    #     frame = tk.Frame(root, width=520, height=480, bg="#d3d3d3")  # Darker frame color
-    #     frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the frame
-    #     return frame
-
     def display_graph(self, error_lbl, old_frame, root):
         error_lbl.place(x=900, y=300)
         #valid inputs -> construct signal `obj and go to displaying the graphs
@@ -133,44 +91,20 @@ class Task1:
             signal_data = utils.get_data(entries) 
             signal, time = signals.generate_signal(signal_data, error_lbl)
             if signal:
-                x_samples = [i for i in range(len(signal.y_values))]
+                x_samples = [i for i in range(len(signal.y))]
                 print(signal.func)
                 if signal.func=='Sine':
-                    files.writeOnFile(signal, './files/task1/sin_output.txt')
+                    files.writeOnFile_constructed(signal, './files/task1/sin_output.txt')
                 else:
-                    files.writeOnFile(signal, './files/task1/cos_output.txt')
+                    files.writeOnFile_constructed(signal, './files/task1/cos_output.txt')
 
                 old_frame.destroy()
                 self.generate_frame = guiHelpers.right_frame(self.right_section)
     
-                fig = Figure(figsize=(5, 2), dpi=100)
-                plot = fig.add_subplot(1, 1, 1)
-        
-                plot.scatter(x_samples, signal.y_values, color="blue", marker="x")  # Discrete points with circular markers
-                plot.set_xlabel("time")
-                plot.set_ylabel("signal")
-                plot.grid(True)
-                # plot.set_xlim(0, 1)
-                # attach the figure into the Tkinter canvas
-                canvas = FigureCanvasTkAgg(fig, master=self.generate_frame)
-                canvas.draw()
-                canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+                guiHelpers.discreteGraph(self.generate_frame,'top', signal)
 
-                x_y_Spline = make_interp_spline(x=time, y=signal.y_values)
-                x_quad = np.linspace(min(x_samples), max(x_samples), 500)
-                y_quad = x_y_Spline(x_quad)
-
-                fig = Figure(figsize=(5, 2), dpi=100)
-                plot = fig.add_subplot(1, 1, 1)
-                plot.grid(True)
-                plot.plot(x_quad, y_quad)  
-                plot.set_xlabel("time")
-                plot.set_ylabel("signal")
-
-                canvas = FigureCanvasTkAgg(fig, master=self.generate_frame)
-                canvas.draw()
-                canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
-
+                guiHelpers.continousGraph(self.generate_frame,'bottom', signal)
+              
                 print("in display graphs")
         else:
             error_lbl.place(x=200, y=300)

@@ -16,23 +16,24 @@ def getFile(path):
     return None
 
 
-def writeOnFile(signal:ConstructedSignal, filename='output.txt'):
+def writeOnFile_constructed(signal:ConstructedSignal, filename='output.txt'):
     with open(f"{filename}", "w") as file:
         file.write('0\n')
         file.write('0\n')
         file.write(f'{signal.sample_no}\n')
         for i in range(signal.sample_no):
-            tmp = round(signal.y_values[i], 6)
+            tmp = round(signal.y[i], 6)
             file.write(f'{i} {tmp}\n')
 
-# sample aplitude -> 1st row = 0
 
-# [SignalType] // Time-->0/Freq-->1
-# [IsPeriodic] // takes 0 or 1
-# [Index SampleAmp] or [Freq Amp PhaseShift]//
-# N1 rows follow with Sample Index followed by space followed by Sample Amplitude in 
-# case Time domain was specified in the first row in the file,
-# or N1 rows follow with frequency followed by space followed by amplitude followed by Phase shift
+def writeOnFile_read(signal:ReadSignal, filename='output.txt'):
+    with open(f"{filename}", "w") as file:
+        file.write(f"{signal.signalType}\n")
+        file.write(f"{signal.isPeriodic}\n")
+        file.write(f'{signal.sampleNo}\n')
+        for i in range(signal.sampleNo):
+            tmp = round(signal.y[i], 6)
+            file.write(f'{signal.x[i]} {tmp}\n')
 
 def readStructure(fileName):
     list = []
