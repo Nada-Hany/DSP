@@ -190,22 +190,24 @@ class Task2:
             validNumber.place(x=200, y=100)
 
     def to_square_signals(self):
-        print("in square signals")
-        self.destroyFrames()
-        self.square_signals_frame = guiHelpers.right_frame(self.right_section)
-        nosignal=tk.Label(self.right_section, text="please read a signal first")
+     print("in square signals")
+     self.destroyFrames()
+     self.square_signals_frame = guiHelpers.right_frame(self.right_section)
+     nosignal = tk.Label(self.right_section, text="please read a signal first")
 
-        signal = self.signal_1 or self.signal_2
+     signal = self.signal_1 or self.signal_2
 
-        signal.y = [(i * i) for i in signal.y]
+     if signal:
+        # Square the y values using a built-in map function
+        signal.y = list(map(lambda i: i ** 2, signal.y))
 
-        if signal:
-            guiHelpers.discreteGraph(self.square_signals_frame, 'top', signal)
-            guiHelpers.continousGraph(self.square_signals_frame, 'bottom', signal)
-            files.writeOnFile_read(signal, f"{staticPath}squared_signal.txt")
-        
-        else:
-            nosignal.place(x=200,y=200)  # Show message if no signal is loaded
+        guiHelpers.discreteGraph(self.square_signals_frame, 'top', signal)
+        guiHelpers.continousGraph(self.square_signals_frame, 'bottom', signal)
+        files.writeOnFile_read(signal, f"{staticPath}squared_signal.txt")
+     else:
+        # Show message if no signal is loaded
+            nosignal.place(x=200, y=200)
+
     
 
         
