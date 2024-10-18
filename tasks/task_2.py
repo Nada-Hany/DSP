@@ -1,3 +1,4 @@
+from blinker import Signal
 import guiHelpers
 import tkinter as tk
 from utils import Button
@@ -85,7 +86,24 @@ class Task2:
     def to_add_signals(self):
         print("in add signals")
         self.destroyFrames()
-        self.accumulation_frame = guiHelpers.right_frame(self.right_section)
+        self.add_signals_frame= guiHelpers.right_frame(self.right_section)
+        nosignal=tk.Label(self.right_section, text="please read a signal first")
+        signal= self.signal_1 and self.signal_2
+        if signal:
+            nosignal.destroy()
+            min_len = min(len(self.signal_1.y), len(self.signal_2.y))
+            signal_1_truncated = self.signal_1.y[:min_len]
+            signal_2_truncated = self.signal_2.y[:min_len]
+            combined_signal_y = signal_1_truncated + signal_2_truncated
+            combined_signal =(combined_signal_y, np.arange(1, len(combined_signal_y) + 1))
+            guiHelpers.discreteGraph(self.add_signals_frame, 'top', combined_signal)
+            guiHelpers.continousGraph(self.add_signals_frame, 'top', combined_signal)
+            files.writeOnFile_read(combined_signal, f"{staticPath}added_signals.txt")
+        else:
+            nosignal.pack()  # Show message if no signal is loaded
+        print("No signal loaded to add.")
+            
+
     
     def to_subtract_signals(self):
         print("in subtract signals")
