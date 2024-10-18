@@ -85,22 +85,22 @@ class Task2:
     def to_add_signals(self):
         print("in add signals")
         self.destroyFrames()
-        self.accumulation_frame = guiHelpers.right_frame(self.add_signals_frame)
+        self.accumulation_frame = guiHelpers.right_frame(self.right_section)
     
     def to_subtract_signals(self):
         print("in subtract signals")
         self.destroyFrames()
-        self.accumulation_frame = guiHelpers.right_frame(self.subtract_signals_frame)
+        self.accumulation_frame = guiHelpers.right_frame(self.right_section)
     
     def to_multiply_signals(self):
         print("in multiply signals")
         self.destroyFrames()
-        self.accumulation_frame = guiHelpers.right_frame(self.multiply_signals_frame)
+        self.accumulation_frame = guiHelpers.right_frame(self.right_section)
     
     def to_square_signals(self):
         print("in square signals")
         self.destroyFrames()
-        self.accumulation_frame = guiHelpers.right_frame(self.square_signals_frame)
+        self.accumulation_frame = guiHelpers.right_frame(self.right_section)
     
     def to_normalization(self):
         print("in normalization")
