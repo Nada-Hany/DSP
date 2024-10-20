@@ -2,14 +2,15 @@ from blinker import Signal
 import guiHelpers
 import tkinter as tk
 from utils import Button
-import utils, files
+import utils, files, test
 from tkinter import ttk
 import numpy as np
 from utils import ReadSignal
+from guiHelpers import Graph
+from tkinter import filedialog
 
-
-staticPath= './files/task2/'
-
+staticPath= './files/task2/constructed'
+testPath = './files/task2/'
 
 class Task2:
     def __init__(self, root, main):
@@ -24,6 +25,9 @@ class Task2:
         self.signal_1 = None
         self.signal_2 = None
         self.main = main
+        self.signals=[]
+        self.baseSignals = []
+        self.graph = Graph()
         
     def destroyFrames(self):
         self.add_signals_frame.destroy()
@@ -65,9 +69,7 @@ class Task2:
         square_signal_btn = Button(btn_x, 170, "Square Signals", lambda:self.to_square_signals())
         normalization_btn = Button(btn_x, 220, "Normalize", lambda:self.to_normalization())
         accumulation_btn = Button(btn_x, 270, "Accumulation", lambda:self.to_accumulation())
-        read_signal1_btn = Button(btn_x, 320, "read signal-1", lambda:self.read_signal1())
-        read_signal2_btn = Button(btn_x, 370, "read signal-2", lambda:self.read_signal2())
-        
+        read_signal_btn = Button(btn_x, 320, "read signals", lambda:self.select_files()) 
         
         buttons = []
         buttons.append(add_signal_btn)
@@ -76,8 +78,7 @@ class Task2:
         buttons.append(square_signal_btn)
         buttons.append(normalization_btn)
         buttons.append(accumulation_btn)
-        buttons.append(read_signal1_btn)
-        buttons.append(read_signal2_btn)
+        buttons.append(read_signal_btn)
         for btn in buttons:
             tmp = tk.Button(left_frame, text=f"{btn.name}", bg="#808080", fg="white", width=15, height=2, command=btn.onClick)
             tmp.place(x=btn.x, y=btn.y)
@@ -86,33 +87,37 @@ class Task2:
     
 
     def to_add_signals(self):
+        self.signals = self.baseSignals
         print("in add signals")
         self.destroyFrames()
         self.add_signals_frame= guiHelpers.right_frame(self.right_section)
         nosignal=tk.Label(self.right_section, text="please read a signal first")
-        signal= self.signal_1 and self.signal_2
+        signal= (len(self.signals)>1)
+
         # variable signal -> datatype == boolean 
         if signal:
             nosignal.destroy()
             # key -> index , value -> y value
             dict = {}
-            for i in range(self.signal_1.sampleNo):
-                dict[self.signal_1.x[i]] = self.signal_1.y[i]
+            for signal in self.signals:
+                for i in range(signal.sampleNo):
+                    if(signal.x[i] not in dict):
+                        dict[signal.x[i]] = signal.y[i]
+                    else:
+                        dict[signal.x[i]] += signal.y[i]
 
-            for i in range(self.signal_2.sampleNo):
-                if(dict[self.signal_2.x[i]] in dict):
-                    dict[self.signal_2.x[i]] += self.signal_2.y[i]
-                else:
-                    dict[self.signal_2.x[i]] = dict[self.signal_2.y[i]]
-            
             x = list(dict.keys())
             y = list(dict.values())
         
-            signal = ReadSignal(0, self.signal_1.isPeriodic, len(x), y, x)
-
-            guiHelpers.discreteGraph(self.add_signals_frame, 'top', signal)
-            guiHelpers.continousGraph(self.add_signals_frame, 'top', signal)
-            files.writeOnFile_read(signal, f"{staticPath}added_signals.txt")
+            signal = ReadSignal(0, self.signals[0].isPeriodic, len(x), y, x)
+            self.graph.clear()
+            self.graph.discreteGraph(self.add_signals_frame, [signal])
+            self.graph.continousGraph(self.add_signals_frame, [signal])
+            print("signal-1 + signal-2")
+            test.SignalSamplesAreEqual(f'{testPath}Signal1+signal2.txt', x, y)
+            print("signal-1 + signal-3")
+            test.SignalSamplesAreEqual(f'{testPath}signal1+signal3.txt', x, y)
+            # files.writeOnFile_read(signal, f"{staticPath}added_signals.txt")
         else:
             nosignal.place(x=200,y=200)  # Show message if no signal is loaded
         print("No signal loaded to add.")
@@ -120,53 +125,65 @@ class Task2:
 
     
     def to_subtract_signals(self):
+        self.signals = self.baseSignals
         print("in subtract signals")
         self.destroyFrames()
         self.subtract_signals_frame = guiHelpers.right_frame(self.right_section)
         nosignal=tk.Label(self.right_section, text="please read a signal first")
-        signal= self.signal_1 and self.signal_2
+        signal= (len(self.signals)>1)
         # variable signal -> datatype == boolean 
         if signal:
             nosignal.destroy()
             # key -> index , value -> y value
-            dict = {}
-            for i in range(self.signal_1.sampleNo):
-                dict[self.signal_1.x[i]] = self.signal_1.y[i]
 
-            for i in range(self.signal_2.sampleNo):
-                if(dict[self.signal_2.x[i]] in dict):
-                    dict[self.signal_2.x[i]] = abs(dict[self.signal_2.x[i]] -self.signal_2.y[i])
-                else:
-                    dict[self.signal_2.x[i]] = dict[self.signal_2.y[i]]
-            
+            dict = {}
+            for signal in self.signals:
+                for i in range(signal.sampleNo):
+                    if(signal.x[i] not in dict):
+                        dict[signal.x[i]] = signal.y[i]
+                    else:
+                        dict[signal.x[i]] = abs(dict[signal.x[i]] - signal.y[i])
+
             x = list(dict.keys())
             y = list(dict.values())
         
-            signal = ReadSignal(0, self.signal_1.isPeriodic, len(x), y, x)
-
-            guiHelpers.discreteGraph(self.subtract_signals_frame, 'top', signal)
-            guiHelpers.continousGraph(self.subtract_signals_frame, 'bottom', signal)
-            files.writeOnFile_read(signal, f"{staticPath}subtracted_signals.txt")
+            signal = ReadSignal(0, self.signals[0].isPeriodic, len(x), y, x)
+            self.graph.clear()
+            self.graph.discreteGraph(self.subtract_signals_frame, [signal])
+            self.graph.continousGraph(self.subtract_signals_frame, [signal])
+            print("signal-1 - signal-2")
+            test.SignalSamplesAreEqual(f'{testPath}signal1-signal2.txt', x, y)
+            print("signal-1 - signal-3")
+            test.SignalSamplesAreEqual(f'{testPath}signal1-signal3.txt', x, y)
+            # files.writeOnFile_read(signal, f"{staticPath}subtracted_signals.txt")
         else:
              nosignal.place(x=200,y=200)  # Show message if no signal is loaded
     
+
+
     def to_multiply_signals(self, number):
+        self.signals = self.baseSignals
         print("in multiply signals")
         self.destroyFrames()
         self.multiply_signals_frame = guiHelpers.right_frame(self.right_section)
+        y = self.signals[0].y 
+        y = [(int(number) * i) for i in range(len(y))]
+        self.graph.clear()
+        self.graph.discreteGraph(self.multiply_signals_frame, self.signals)
+        self.graph.continousGraph(self.multiply_signals_frame, self.signals)
 
-        signal = self.signal_1 or self.signal_2
-
-        signal.y = [(int(number) * i) for i in signal.y]
-
-        guiHelpers.discreteGraph(self.multiply_signals_frame, 'top', signal)
-        guiHelpers.continousGraph(self.multiply_signals_frame, 'bottom', signal)
-        files.writeOnFile_read(signal, f"{staticPath}multipled_signal.txt")
+        print("signal-1 * 5")
+        test.SignalSamplesAreEqual(f'{testPath}MultiplySignalByConstant-Signal1 - by 5.txt', self.signals[0].x, y)
+        print("signal-2 * 10")
+        test.SignalSamplesAreEqual(f'{testPath}MultiplySignalByConstant-signal2 - by 10.txt', self.signals[0].x, y)
+        files.writeOnFile_read(self.signals[0], f"{staticPath}multipled_signal.txt")
     
+
+
     def get_multiplication_number(self):
         print("in get number for multiplication")
         nosignal=tk.Label(self.right_section, text="please read a signal first")
-        if self.signal_1 or self.signal_2:
+        if (len(self.signals) >= 1):
             self.destroyFrames()
             nosignal.destroy()
             self.multiply_signals_frame = guiHelpers.right_frame(self.right_section)
@@ -180,6 +197,7 @@ class Task2:
         else:
             nosignal.place(x=200,y=200)
 
+
     def checkNumber(self, entry):
         check = entry.get()
         validNumber=tk.Label(self.multiply_signals_frame, text="please enter a number")
@@ -190,28 +208,33 @@ class Task2:
             validNumber.place(x=200, y=100)
 
     def to_square_signals(self):
-     print("in square signals")
-     self.destroyFrames()
-     self.square_signals_frame = guiHelpers.right_frame(self.right_section)
-     nosignal = tk.Label(self.right_section, text="please read a signal first")
+        self.signals = self.baseSignals
+        print("in square signals")
+        self.destroyFrames()
+        self.square_signals_frame = guiHelpers.right_frame(self.right_section)
+        nosignal = tk.Label(self.right_section, text="please read a signal first or read only one")
 
-     signal = self.signal_1 or self.signal_2
-
-     if signal:
-        # Square the y values using a built-in map function
-        signal.y = list(map(lambda i: i ** 2, signal.y))
-
-        guiHelpers.discreteGraph(self.square_signals_frame, 'top', signal)
-        guiHelpers.continousGraph(self.square_signals_frame, 'bottom', signal)
-        files.writeOnFile_read(signal, f"{staticPath}squared_signal.txt")
-     else:
-        # Show message if no signal is loaded
-            nosignal.place(x=200, y=200)
+        signal = (len(self.signals)==1)
+        
+        if signal:
+            # Square the y values using a built-in map function
+            y=self.signals[0].y
+            y = list(map(lambda i: i ** 2, y))
+            self.graph.clear()
+            self.graph.discreteGraph(self.square_signals_frame, self.signals)
+            self.graph.continousGraph(self.square_signals_frame, self.signals)
+            print("signal-1 square")
+            test.SignalSamplesAreEqual(f'{testPath}Output squaring signal 1.txt', self.signals[0].x, y)
+            # files.writeOnFile_read(self.signals[0], f"{staticPath}squared_signal.txt")
+        else:
+            # Show message if no signal is loaded
+            nosignal.place(x=170, y=200)
 
     
 
         
     def to_normalization(self):
+        self.signals = self.baseSignals
         print("in normalization")
     
         self.destroyFrames()
@@ -219,54 +242,59 @@ class Task2:
         noSignalError = tk.Label(self.right_section, text="please read a signal first")
         # range of normalization [-1,1]
         new_min, new_max = -1, 1
-        signal = self.signal_1 or self.signal_2
+        signal = (len(self.signals)==1)
         if signal:
+            y = self.signals[0].y
             noSignalError.destroy()
-            y_min, y_max = np.min(signal.y), np.max(signal.y)
-            signal.y = (signal.y - y_min) / (y_max - y_min) * (new_max - new_min) + new_min
+            y_min, y_max = np.min(y), np.max(y)
+            y = (y - y_min) / (y_max - y_min) * (new_max - new_min) + new_min
 
-            signal.x = np.arange(1, len(signal.y) + 1)
-
-            guiHelpers.discreteGraph(self.normalization_frame, 'top', signal)
-            guiHelpers.continousGraph(self.normalization_frame, 'top', signal)
-
-            files.writeOnFile_read(signal, f"{staticPath}normalization.txt")
+            self.signals[0].x = np.arange(1, len(y) + 1)
+            self.graph.clear()
+            self.graph.discreteGraph(self.normalization_frame, self.signals)
+            self.graph.continousGraph(self.normalization_frame, self.signals)
+            print("signal-1 normalization from -1 to 1")
+            test.SignalSamplesAreEqual(f'{testPath}normalize of signal 1 (from -1 to 1)-- output.txt', self.signals[0].x, y)
+          
+            # files.writeOnFile_read(signal, f"{staticPath}normalization.txt")
 
         else:
             noSignalError.place(x=200,y=200)
             
     def to_accumulation(self):
-
+        self.signals = self.baseSignals
         self.destroyFrames()
         self.accumulation_frame = guiHelpers.right_frame(self.right_section)
         noSignalError = tk.Label(self.right_section, text="please read a signal first")
 
-        signal = self.signal_1 or self.signal_2
+        signal = (len(self.signals)==1)
         if signal:
             noSignalError.destroy()
             accumulation = []
             accumulation.append(0)
-            for i in range(1, len(signal.y)):
+            for i in range(1, len(self.signals[0].y)):
                 tmp = i + accumulation[i-1]
                 accumulation.append(tmp)
-            
-            guiHelpers.discreteGraph(self.accumulation_frame, "top", signal)
-            guiHelpers.continousGraph(self.accumulation_frame, "top", signal)
-            signal.y = accumulation
-            files.writeOnFile_read(signal, f"{staticPath}accumulation.txt")
+            self.graph.clear()
+            self.graph.discreteGraph(self.accumulation_frame, self.signals)
+            self.graph.continousGraph(self.accumulation_frame, self.signals)
+            self.signals[0].y = accumulation
+            print("signal-1 accumulation")
+            test.SignalSamplesAreEqual(f'{testPath}output accumulation for signal1.txt', self.signals[0].x, self.signals[0].y)
+            # files.writeOnFile_read(self.signals[0], f"{staticPath}accumulation.txt")
 
         else:
             noSignalError.place(x=200,y=200)
     
-
-
-    def read_signal1(self):
-        print("in read signal 1")
-        file = utils.browse_file()
-        self.signal_1 = files.getSignalFromFile(file)
-
-
-    def read_signal2(self):
-        print("in read signal 2")
-        file = utils.browse_file()
-        self.signal_2 = files.getSignalFromFile(file)
+    def select_files(self):
+        # Open file dialog to select multiple text files
+        file_paths = filedialog.askopenfilenames(
+            title="Select Text Files",
+            filetypes=[("Text Files", "*.txt")],
+            multiple=True
+        )
+        
+        for file in file_paths:
+            self.signals.append(files.getSignalFromFile(file))
+        
+        self.baseSignals = self.signals

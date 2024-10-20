@@ -8,6 +8,9 @@ import numpy as np
 back_btn_y = 460
 btn_x = 20
 
+
+
+
 def right_frame(root):
     frame = tk.Frame(root, width=520, height=480, bg="#d3d3d3")  # Darker frame color
     frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the frame
@@ -29,43 +32,49 @@ places = {
      "bottom":tk.BOTTOM
 }
 
-def discreteGraph(root, place, signal_1, signal_2 = None):
-    fig = Figure(figsize=(5, 2.1), dpi=100)
-    plot = fig.add_subplot(1, 1, 1)
+markers = ['x', 'o', '*', '^0', '<', ">"]
+colors = ['blue', 'red', 'yellow', 'green', 'black']
 
+class Graph:
+    def __init__(self):
+        self.fig = Figure(figsize=(5, 2.1), dpi=100)
+        self.plot = self.fig.add_subplot(1, 1, 1)
+        
 
-    for i in range(len(signal_1.x)):
-        plot.plot([i, i], [0, signal_1.y[i]], 'b-') 
-
-    plot.scatter(signal_1.x, signal_1.y, color="blue", marker="x")  
-    if signal_2:
-        plot.scatter(signal_2.x, signal_2.y, color="red", marker="o")  
-        for i in range(len(signal_2.x)):
-            plot.plot([i, i], [0, signal_2.y[i]], 'b-') 
+    def clear(self):
+        self.plot.clear()
          
-    plot.grid(True)
-    canvas = FigureCanvasTkAgg(fig, master=root)
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=places[place], fill=tk.BOTH, expand=1)
+    def discreteGraph(self, root, signals):
+        # self.plot.close(self.fig)
+        self.fig = Figure(figsize=(5, 2.1), dpi=100)
+        self.plot = self.fig.add_subplot(1, 1, 1)
 
-
-def continousGraph(root, place, signal_1, signal_2 = None):
-
-    x_y_Spline = make_interp_spline(x=signal_1.x, y=signal_1.y)
-    x_quad = np.linspace(min(signal_1.x), max(signal_1.x), 500)
-    y_quad = x_y_Spline(x_quad)
-
-    fig = Figure(figsize=(5, 2), dpi=100)
-    plot = fig.add_subplot(1, 1, 1)
-    plot.plot(x_quad, y_quad, color='blue')  
-    plot.grid(True)
     
-    if signal_2:
-        x_y_Spline = make_interp_spline(x=signal_2.x, y=signal_2.y)
-        x_quad = np.linspace(min(signal_2.x), max(signal_2.x), 500)
-        y_quad = x_y_Spline(x_quad)
-        plot.plot(x_quad, y_quad, color='red')  
+        for i in range(len(signals)):
+            self.plot.plot([i, i], [0, signals[i].y[i]], 'b-') 
 
-    canvas = FigureCanvasTkAgg(fig, master=root)
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=places[place], fill=tk.BOTH, expand=1)
+            self.plot.scatter(signals[i].x, signals[i].y, color=f"{colors[i]}", marker=f"{markers[i]}")  
+
+        self.plot.grid(True)
+        canvas = FigureCanvasTkAgg(self.fig, master=root)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
+
+
+    def continousGraph(self, root, signals):
+        self.fig = Figure(figsize=(5, 2.1), dpi=100)
+        self.plot = self.fig.add_subplot(1, 1, 1)
+        
+        for i in range(len(signals)):
+            x = signals[i].x
+            y = signals[i].y
+            x_y_Spline = make_interp_spline(x=x, y=y)
+            x = np.linspace(min(x), max(x), 500)
+            y = x_y_Spline(x)
+
+            self.plot.plot(x, y, color=f'{colors[i]}')  
+        self.plot.grid(True)
+        
+        canvas = FigureCanvasTkAgg(self.fig, master=root)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)

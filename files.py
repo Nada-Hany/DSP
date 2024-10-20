@@ -31,9 +31,9 @@ def writeOnFile_read(signal:ReadSignal, filename='output.txt'):
         file.write(f"{signal.signalType}\n")
         file.write(f"{signal.isPeriodic}\n")
         file.write(f'{signal.sampleNo}\n')
-        for i in range(signal.sampleNo):
-            tmp = round(signal.y[i], 6)
-            file.write(f'{signal.x[i]} {tmp}\n')
+        for x, y in zip(signal.x, signal.y):
+            tmp = round(y, 6)
+            file.write(f'{x} {tmp}\n')
 
 def readStructure(fileName):
     list = []

@@ -23,7 +23,8 @@ def SignalSamplesAreEqual(file_name,indices,samples):
                 line = f.readline()
             else:
                 break
-                
+    print(f'expected sample:  {len(expected_samples)}')
+    print(f'given samples:  {len(samples)}')
     if len(expected_samples)!=len(samples):
         print("Test case failed, your signal have different length from the expected one")
         return
@@ -35,14 +36,14 @@ def SignalSamplesAreEqual(file_name,indices,samples):
             return
     print("Test case passed successfully")
 
-signal = files.getSignalFromFile(f'{staticPath_task1}CosOutput.txt')
-# print(signal.sampleList)
-# ind = [i for i in range(0, len(signal.sampleList))]
-# # print(ind)
-# samples = []
-# for i in range(len(signal.sampleList)):
-#     samples.append(float(signal.sampleList[i]))
+# signal = files.getSignalFromFile(f'{staticPath_task1}CosOutput.txt')
+# # print(signal.sampleList)
+# # ind = [i for i in range(0, len(signal.sampleList))]
+# # # print(ind)
+# # samples = []
+# # for i in range(len(signal.sampleList)):
+# #     samples.append(float(signal.sampleList[i]))
 
-SignalSamplesAreEqual(f'{staticPath_task1}cos_output.txt',signal.x, signal.y)
+# SignalSamplesAreEqual(f'{staticPath_task1}cos_output.txt',signal.x, signal.y)
 
 
