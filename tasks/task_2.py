@@ -67,7 +67,7 @@ class Task2:
         subtract_signal_btn = Button(btn_x, 70, "Subtract Signals", lambda:self.to_subtract_signals())
         multiply_signal_btn = Button(btn_x, 120, "Multiply Signals", lambda:self.get_multiplication_number())
         square_signal_btn = Button(btn_x, 170, "Square Signals", lambda:self.to_square_signals())
-        normalization_btn = Button(btn_x, 220, "Normalize", lambda:self.to_normalization())
+        normalization_btn = Button(btn_x, 220, "Normalize", lambda:self.get_normalize_ratio())
         accumulation_btn = Button(btn_x, 270, "Accumulation", lambda:self.to_accumulation())
         read_signal_btn = Button(btn_x, 320, "read signals", lambda:self.select_files()) 
         
@@ -159,8 +159,6 @@ class Task2:
         else:
              nosignal.place(x=200,y=200)  # Show message if no signal is loaded
     
-
-
     def to_multiply_signals(self, number):
         self.signals = self.baseSignals
         print("in multiply signals")
@@ -177,8 +175,6 @@ class Task2:
         print("signal-2 * 10")
         test.SignalSamplesAreEqual(f'{testPath}MultiplySignalByConstant-signal2 - by 10.txt', self.signals[0].x, y)
         files.writeOnFile_read(self.signals[0], f"{staticPath}multipled_signal.txt")
-    
-
 
     def get_multiplication_number(self):
         print("in get number for multiplication")
@@ -231,9 +227,38 @@ class Task2:
             nosignal.place(x=170, y=200)
 
     
+    def get_normalize_ratio(self):
+        print("in get normalization ratio")
+        self.destroyFrames()
+        nosignal=tk.Label(self.right_section, text="please read a signal first")
+        if (len(self.signals) == 1):
+            self.destroyFrames()
+            nosignal.destroy()
+            self.normalization_frame = guiHelpers.right_frame(self.right_section)
 
+            combo = ttk.Combobox(self.normalization_frame, values=["[-1,1]", "[0,1]"], state="readonly", width=27)
+            combo.set("choose range")
+            combo.place(x=180, y=200)
+
+            back_btn = tk.Button(self.normalization_frame, text="construct signal", bg="#808080", fg="white", width=15, height=2, command=lambda:self.check_ratio(combo))
+            back_btn.place(x= 200, y=300)
+         
+        else:
+            nosignal.place(x=200,y=200)
         
-    def to_normalization(self):
+    def check_ratio(self, entry):
+        val = entry.get()
+        validRange =tk.Label(self.normalization_frame, text="please select a range")
+        if val != 'choose range':
+            if val == '[-1,1]':
+                self.to_normalization('1')
+            else:
+                self.to_normalization('2')
+        else:
+            validRange.place(x=200, y=100)
+
+
+    def to_normalization(self, range):
         self.signals = self.baseSignals
         print("in normalization")
     
@@ -241,7 +266,10 @@ class Task2:
         self.normalization_frame = guiHelpers.right_frame(self.right_section)
         noSignalError = tk.Label(self.right_section, text="please read a signal first")
         # range of normalization [-1,1]
-        new_min, new_max = -1, 1
+        if(range == '1'):
+            new_min, new_max = -1, 1
+        else:
+            new_min, new_max = 0, 1
         signal = (len(self.signals)==1)
         if signal:
             y = self.signals[0].y
@@ -255,6 +283,8 @@ class Task2:
             self.graph.continousGraph(self.normalization_frame, self.signals)
             print("signal-1 normalization from -1 to 1")
             test.SignalSamplesAreEqual(f'{testPath}normalize of signal 1 (from -1 to 1)-- output.txt', self.signals[0].x, y)
+            print("signal-2 normalization from 0 to 1")
+            test.SignalSamplesAreEqual(f'{testPath}normlize signal 2 (from 0 to 1 )-- output.txt', self.signals[0].x, y)
           
             # files.writeOnFile_read(signal, f"{staticPath}normalization.txt")
 
