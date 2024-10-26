@@ -12,6 +12,7 @@ from tkinter import filedialog
 staticPath= './files/task2/constructed'
 testPath = './files/task2/'
 
+
 class Task2:
     def __init__(self, root, main):
         self.root =root
@@ -165,7 +166,11 @@ class Task2:
         self.destroyFrames()
         self.multiply_signals_frame = guiHelpers.right_frame(self.right_section)
         y = self.signals[0].y 
-        y = [(int(number) * i) for i in range(len(y))]
+        print(y)
+        self.signals[0].y  = [(int(number) * i) for i in y]
+        # y_ = []
+        # for i in range(len(y)):
+        #     y_.append(number * y[i])\
         self.graph.clear()
         self.graph.discreteGraph(self.multiply_signals_frame, self.signals)
         self.graph.continousGraph(self.multiply_signals_frame, self.signals)
