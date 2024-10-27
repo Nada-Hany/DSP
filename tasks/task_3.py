@@ -68,7 +68,12 @@ class Task3:
             style.configure("Treeview", rowheight=40)  # Set row height (in pixels)
             self.get_quantization_value()
             # Define columns
-            columns = ("index", "encoded", "quantization", "error")
+
+            if self.method_comboBox.get() == 'Levels':
+                columns = ("index", "encoded", "quantization", "error")
+            else:
+                columns = ("encoded", "quantization")
+
 
             signal = self.signals[0]
 
@@ -76,26 +81,36 @@ class Task3:
             tree = ttk.Treeview(self.quantization_frame, columns=columns, show="headings", style="Treeview")
             tree.pack(fill=tk.BOTH, expand=True)
 
-            # Define headings
-            tree.heading("index", text="index")
-            tree.heading("encoded", text="encoded")
-            tree.heading("quantization", text="quantization")
-            tree.heading("error", text="error")
+            data = []
 
-            # Define column widths and alignment
-            tree.column("index", anchor=tk.CENTER, width=80)
-            tree.column("encoded", anchor=tk.CENTER, width=100)
-            tree.column("quantization", anchor=tk.CENTER, width=120)
-            tree.column("error", anchor=tk.CENTER, width=80)
+            if self.method_comboBox.get() == 'Levels':
+                for i in range(signal.sampleNo):
+                    data.append((signal.intervals[i], signal.encoded[i], signal.quantization[i], signal.error[i]))
+                tree.heading("index", text="index")
+                tree.heading("encoded", text="encoded")
+                tree.heading("quantization", text="quantization")
+                tree.heading("error", text="error")
+
+                tree.column("index", anchor=tk.CENTER, width=80)
+                tree.column("encoded", anchor=tk.CENTER, width=100)
+                tree.column("quantization", anchor=tk.CENTER, width=120)
+                tree.column("error", anchor=tk.CENTER, width=80)
+            else:
+                for i in range(signal.sampleNo):
+                    data.append((signal.encoded[i], signal.quantization[i]))
+
+                tree.heading("encoded", text="encoded")
+                tree.heading("quantization", text="quantization")
+
+                tree.column("encoded", anchor=tk.CENTER, width=120)
+                tree.column("quantization", anchor=tk.CENTER, width=120)
 
             # Configure row colors
             tree.tag_configure("oddrow", background="lightgrey")
             tree.tag_configure("evenrow", background="darkgrey")
 
             # Add some example data (optional) with alternating colors
-            data = []
-            for i in range(signal.sampleNo):
-                data.append((signal.intervals[i], signal.encoded[i], signal.quantization[i], signal.error[i]))
+        
             # Insert data into the table with alternating row colors
             for index, row in enumerate(data):
                 tag = "evenrow" if index % 2 == 0 else "oddrow"
@@ -121,7 +136,7 @@ class Task3:
         end = start + delta
         i = 0
         flag = True
-        
+        # calculating range intervals and their midpoints
         while flag:
             ranges.append([round(start, 2), round(end, 2)])
             self.signals[0].midpoints.append(round(((start+end)/2), 3))
@@ -131,28 +146,32 @@ class Task3:
                 break
             i+=1
 
-        signal = self.signals[0]
+        # getting which interval each sample belong to 
         for sample in range(signal.sampleNo):
             for rang in ranges:
                 if signal.y[sample] >= rang[0] and signal.y[sample] <= rang[1]:
                     signal.intervals.append(ranges.index(rang))
                     break
         
+        # calculating quantization value and error
         signal.quantization = list(map(lambda x : round(signal.midpoints[x], 4), signal.intervals))
         for i in range(signal.sampleNo):
             signal.error.append(round(signal.midpoints[signal.intervals[i]] - signal.y[i], 3))
-
-        bits_required = math.floor(math.log2(levels + 1))
         
+        # setting the encoded binary 
+        bits_required = math.floor(math.log2(levels + 1))
         signal.encoded = list(map(lambda x : bin(x)[2:].zfill(bits_required), signal.intervals))
+        
         signal.intervals = list(map(lambda x: x+1, signal.intervals))
+
         self.signals[0] = signal
-        print("test case 2")
-        # levels -> 4 -- 2 bits
-        test.QuantizationTest2(f'{staticPath}Quan2_Out.txt', signal.intervals, signal.encoded, signal.quantization, signal.error)
+
         print("test case 1")
-        # levels -> 8 -- 3 bits
         test.QuantizationTest1(f'{staticPath}Quan1_Out.txt', signal.encoded ,signal.quantization)
+
+        print("test case 2")
+        test.QuantizationTest2(f'{staticPath}Quan2_Out.txt', signal.intervals, signal.encoded, signal.quantization, signal.error)
+
 
 
     def select_files(self):
