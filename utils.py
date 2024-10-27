@@ -26,6 +26,11 @@ class ReadSignal:
         self.sampleNo = int(sampleNo)
         self.y = [float(i) for i in y]
         self.x = [float(i) for i in x]
+        self.intervals = []
+        self.midpoints = []
+        self.error = []
+        self.quantization = []
+        self.encoded = []
 
 
 #check if all field are entered by the user

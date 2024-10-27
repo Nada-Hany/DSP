@@ -38,7 +38,6 @@ class Task2:
         self.normalization_frame.destroy()
         self.accumulation_frame.destroy()
 
-   
     def goBack(self):
 
         print("in go back func")

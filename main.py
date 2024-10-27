@@ -59,7 +59,9 @@ class mainPage:
 
         task_button_2 = tk.Button(button_frame, text="task 02", **styles["button"], command=lambda: self.toTask_2(contentFrame))
         task_button_2.grid(row=0, column=1, padx=10)
-  
+
+        task_button_3 = tk.Button(button_frame, text="task 03", **styles["button"], command=lambda: self.toTask_3(contentFrame))
+        task_button_3.grid(row=0, column=2, padx=10)
 
 
     def toTask_1(self,frame):
@@ -73,7 +75,13 @@ class mainPage:
         self.run = False
         frame.destroy()
         task = Task2(self.root, main)
-        
+    
+    def toTask_3(self, frame):
+        from tasks.task_3 import Task3
+        self.run = False
+        frame.destroy()
+        task = Task3(self.root, main)
+
 
 main = mainPage()
 main.runMain()
