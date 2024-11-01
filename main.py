@@ -6,7 +6,6 @@ from tkinter import font
 class mainPage:
     
     def __init__(self):
-        self.run = True
         self.root = tk.Tk()
         self.root.geometry("700x500")
         self.root.title("DSP Design")
@@ -55,32 +54,36 @@ class mainPage:
 
 
         task_button_1 = tk.Button(button_frame, text="task 01", **styles["button"], command=lambda: self.toTask_1(contentFrame))
-        task_button_1.grid(row=0, column=0, padx=10)
+        task_button_1.grid(row=0, column=0, padx=10, pady=10)
 
         task_button_2 = tk.Button(button_frame, text="task 02", **styles["button"], command=lambda: self.toTask_2(contentFrame))
-        task_button_2.grid(row=0, column=1, padx=10)
+        task_button_2.grid(row=0, column=1, padx=10, pady=10)
 
         task_button_3 = tk.Button(button_frame, text="task 03", **styles["button"], command=lambda: self.toTask_3(contentFrame))
-        task_button_3.grid(row=0, column=2, padx=10)
+        task_button_3.grid(row=0, column=2, padx=10, pady=10)
 
+        task_button_4 = tk.Button(button_frame, text="task 04", **styles["button"], command=lambda: self.toTask_4(contentFrame))
+        task_button_4.grid(row=1, column=0, padx=10, pady=10)
 
     def toTask_1(self,frame):
         from  tasks.task_1 import Task1
-        self.run = False
         frame.destroy()
         task = Task1(self.root, main)
 
     def toTask_2(self,frame):
         from  tasks.task_2 import Task2
-        self.run = False
         frame.destroy()
         task = Task2(self.root, main)
     
     def toTask_3(self, frame):
         from tasks.task_3 import Task3
-        self.run = False
         frame.destroy()
         task = Task3(self.root, main)
+    
+    def toTask_4(self, frame):
+        from tasks.task_4 import Task4
+        frame.destroy()
+        task = Task4(self.root, main)
 
 
 main = mainPage()

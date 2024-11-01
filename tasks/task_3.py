@@ -175,16 +175,8 @@ class Task3:
 
 
     def select_files(self):
-        # Open file dialog to select multiple text files
-        file_paths = filedialog.askopenfilenames(
-            title="Select Text Files",
-            filetypes=[("Text Files", "*.txt")],
-            multiple=True
-        )
         
-        for file in file_paths:
-            self.signals.append(files.getSignalFromFile(file))
-        
+        self.signals = guiHelpers.select_files()
         self.baseSignals = self.signals
 
     

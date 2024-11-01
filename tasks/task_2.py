@@ -40,7 +40,6 @@ class Task2:
 
     def goBack(self):
 
-        print("in go back func")
         self.add_signals_frame.destroy()
         self.subtract_signals_frame.destroy()
         self.multiply_signals_frame.destroy()
@@ -88,7 +87,6 @@ class Task2:
 
     def to_add_signals(self):
         self.signals = self.baseSignals
-        print("in add signals")
         self.destroyFrames()
         self.add_signals_frame= guiHelpers.right_frame(self.right_section)
         nosignal=tk.Label(self.right_section, text="please read a signal first")
@@ -120,13 +118,11 @@ class Task2:
             # files.writeOnFile_read(signal, f"{staticPath}added_signals.txt")
         else:
             nosignal.place(x=200,y=200)  # Show message if no signal is loaded
-        print("No signal loaded to add.")
             
 
     
     def to_subtract_signals(self):
         self.signals = self.baseSignals
-        print("in subtract signals")
         self.destroyFrames()
         self.subtract_signals_frame = guiHelpers.right_frame(self.right_section)
         nosignal=tk.Label(self.right_section, text="please read a signal first")
@@ -161,11 +157,10 @@ class Task2:
     
     def to_multiply_signals(self, number):
         self.signals = self.baseSignals
-        print("in multiply signals")
         self.destroyFrames()
         self.multiply_signals_frame = guiHelpers.right_frame(self.right_section)
         y = self.signals[0].y 
-        print(y)
+        # print(y)
         self.signals[0].y  = [(int(number) * i) for i in y]
         # y_ = []
         # for i in range(len(y)):
@@ -264,7 +259,6 @@ class Task2:
 
     def to_normalization(self, range):
         self.signals = self.baseSignals
-        print("in normalization")
     
         self.destroyFrames()
         self.normalization_frame = guiHelpers.right_frame(self.right_section)
@@ -321,14 +315,6 @@ class Task2:
             noSignalError.place(x=200,y=200)
     
     def select_files(self):
-        # Open file dialog to select multiple text files
-        file_paths = filedialog.askopenfilenames(
-            title="Select Text Files",
-            filetypes=[("Text Files", "*.txt")],
-            multiple=True
-        )
-        
-        for file in file_paths:
-            self.signals.append(files.getSignalFromFile(file))
-        
+
+        self.signals = guiHelpers.select_files()
         self.baseSignals = self.signals

@@ -1,5 +1,3 @@
-import files
-
 staticPath_task1 = './files/task1/'
 staticPath_task2 = './files/task2/'
 staticPath_task3 = './files/task3/'

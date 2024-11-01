@@ -3,6 +3,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from scipy.interpolate import  make_interp_spline
 import numpy as np
+from tkinter import filedialog
+import files
 
 
 back_btn_y = 460
@@ -27,6 +29,20 @@ def sections(root):
        
         return  left_frame, right_frame
     
+
+def select_files():
+    # Open file dialog to select multiple text files
+    file_paths = filedialog.askopenfilenames(
+        title="Select Text Files",
+        filetypes=[("Text Files", "*.txt")],
+        multiple=True
+    )
+    signals = []
+    for file in file_paths:
+        signals.append(files.getSignalFromFile(file))
+    
+    return signals
+
 places = {
      "top": tk.TOP,
      "bottom":tk.BOTTOM
