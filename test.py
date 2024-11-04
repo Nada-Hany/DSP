@@ -257,3 +257,79 @@ def dft(signal, Fs, inverse):
     
     else:
        return np.arange(N), rev / N
+    
+
+
+    # elif transform_type == 'IDFT':
+    #         amp, phase = self.read_reference_data()
+    #         if not amp or not phase:
+    #             print("Error: No amplitude or phase data read from the reference file.")
+    #             return
+
+    #         sampling_frequency = simpledialog.askfloat("Input", "Enter the sampling frequency in Hz:", minvalue=1.0)
+    #         if sampling_frequency is None:
+    #             return
+
+    #         amp = np.array(amp)
+    #         phase = np.array(phase)
+
+    #         real_part = amp * np.cos(phase)
+    #         imaginary_part = amp * np.sin(phase)
+    #         complex_spectrum = real_part + 1j * imaginary_part
+
+    #         reconstructed_signal = self.fourier_transform(complex_spectrum, inverse=True)
+    #         reconstructed_amplitude = np.round(np.real(reconstructed_signal), decimals=0).tolist()
+
+    #         reference_time, reference_signal = self.read_signals_from_txt_files()
+    #         reference_signal = reference_signal[0].tolist()
+
+    #         recon_amplitude_comparison = SignalComapreAmplitude(reconstructed_amplitude, reference_signal)
+
+    #         if recon_amplitude_comparison:
+    #             print("Reconstructed Amplitude comparison passed successfully.")
+    #         else:
+    #             print("Reconstructed Amplitude comparison failed.")
+    #         elif transform_type == 'IDFT':
+    #         amp, phase = self.read_reference_data()
+    #         if not amp or not phase:
+    #             print("Error: No amplitude or phase data read from the reference file.")
+    #             return
+
+    #         sampling_frequency = simpledialog.askfloat("Input", "Enter the sampling frequency in Hz:", minvalue=1.0)
+    #         if sampling_frequency is None:
+    #             return
+
+    #         amp = np.array(amp)
+    #         phase = np.array(phase)
+
+    #         real_part = amp * np.cos(phase)
+    #         imaginary_part = amp * np.sin(phase)
+    #         complex_spectrum = real_part + 1j * imaginary_part
+
+    #         reconstructed_signal = self.fourier_transform(complex_spectrum, inverse=True)
+    #         reconstructed_amplitude = np.round(np.real(reconstructed_signal), decimals=0).tolist()
+
+    #         reference_time, reference_signal = self.read_signals_from_txt_files()
+    #         reference_signal = reference_signal[0].tolist()
+
+    #         recon_amplitude_comparison = SignalComapreAmplitude(reconstructed_amplitude, reference_signal)
+
+    #         if recon_amplitude_comparison:
+    #             print("Reconstructed Amplitude comparison passed successfully.")
+    #         else:
+    #             print("Reconstructed Amplitude comparison failed.")
+
+
+    #     def fourier_transform(self, signal, inverse=False):
+    #         N = len(signal)
+    #         k = np.arange(N)
+    #         n = np.arange(N)
+    #         # Exponential factor
+    #         if inverse:
+    #             factor = 1 / N
+    #             exponent = np.exp(2j * np.pi * k[:, None] * n / N)  # IDFT
+    #         else:
+    #             factor = 1
+    #             exponent = np.exp(-2j * np.pi * k[:, None] * n / N)  # DFT
+
+    #         return factor * np.dot(exponent, signal)  # Compute DFT or IDFT

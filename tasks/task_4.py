@@ -26,13 +26,11 @@ class Task4:
         self.graph = Graph()
         self.amp_DFT = []
         self.phase_DFT = []
-        self.amp_IDFT = []
-        self.phase_IDFT = []
+        self.sample_IDFT = []
 
     def get_Avtual_lists(self):
         s = files.getSignalFromFile(f'{staticPath}Output_Signal_IDFT.txt')
-        self.amp_IDFT = s.x
-        self.phase_IDFT = s.y
+        self.sample_IDFT = s.y
         s = files.getSignalFromFile(f'{staticPath}Output_Signal_DFT_A,Phase.txt')
         self.amp_DFT = s.x
         self.phase_DFT = s.y
@@ -68,7 +66,6 @@ class Task4:
             
         return  left_frame, right_frame
 
-
     def getComponents(self, signal : ReadSignal, inverse = None):
         sign = 1 if inverse else -1
         scale = (1/signal.sampleNo) if inverse else 1
@@ -77,13 +74,16 @@ class Task4:
         real = np.zeros(N)
         imag = np.zeros(N)
         inv = np.zeros(N)
+        exponent = np.zeros(N)
+        complex = np.zeros(N)
 
         if inverse:
             for i in range(N):
                 amp = signal.x[i]
                 theta = signal.y[i]
-                real[i] = amp * np.cos(theta)
-                imag[i] = amp * np.cos(theta)
+                real[i] = amp * math.cos(theta)
+                imag[i] = amp * math.sin(theta)
+                complex[i] =  real[i] + 1j * imag[i]
 
         for k in range(N): 
             sum_real = 0
@@ -95,16 +95,16 @@ class Task4:
                     sum_imag += signal.y[n] * math.sin(power)
                 else:
                     # inv[k] += real[n] * np.cos(power) - imag[n] * np.sin(power)
+                    # exponent[k] = np.exp(2j * np.pi * k * n / N)
                     inv[k] += real[n] * np.cos(power) - imag[n] * np.sin(power)
 
             result.append((scale * sum_real, scale * sum_imag))
-            
         if not inverse:
             return result
         else:
+            # return self.calulate_IDFT(complex)
             return inv / N
     
-
 
     def get_amp_phase(self, data):
         amp = []
@@ -133,12 +133,12 @@ class Task4:
 
             self.graph.discreteGraph(self.DFT_frame, self.signals)
             print(test.SignalComaprePhaseShift(self.phase_DFT, phase))
-            print("phase --- ")
-            print(phase)
+            print("phase test ^^^ ")
+            # print(phase)
             # self.signals = self.baseSignals
-            print("my amp --- ")
+            print("my amp ----- ")
             print(amp)
-            print("actual amp")
+            print("actual amp ----")
             print(self.amp_DFT)
             self.signals[0].y = amp
             self.graph.discreteGraph(self.DFT_frame, self.signals)
@@ -153,7 +153,14 @@ class Task4:
         noSignalError = tk.Label(self.IDFT_frame, text="please read a signal first")
         if len(self.signals) == 1:
             res = self.getComponents(self.signals[0], 1)
-            print(res)
+            reconstructed_samples = np.round(np.real(res), decimals=0).tolist()  
+            self.signals[0].x = [i for i in range(self.signals[0].sampleNo)]
+            self.signals[0].y = reconstructed_samples
+            print(test.SignalComapreAmplitude(self.sample_IDFT, reconstructed_samples))    
+            print('idft test ^^^')
+            print(reconstructed_samples)
+            self.graph.discreteGraph(self.IDFT_frame, self.signals)
+
         else:
             noSignalError.place(x=200,y=200)
 
