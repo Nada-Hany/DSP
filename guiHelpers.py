@@ -60,14 +60,15 @@ class Graph:
     def clear(self):
         self.plot.clear()
          
-    def discreteGraph(self, root, signals):
+    def discreteGraph(self, root, signals, x = None, y = None):
         # self.plot.close(self.fig)
         self.fig = Figure(figsize=(5, 2.1), dpi=100)
         self.plot = self.fig.add_subplot(1, 1, 1)
 
     
         for i in range(len(signals)):
-            self.plot.plot([i, i], [0, signals[i].y[i]], 'b-') 
+            
+            self.plot.plot([0, i], [0, signals[i].y[i]], 'b-') 
 
             self.plot.scatter(signals[i].x, signals[i].y, color=f"{colors[i]}", marker=f"{markers[i]}")  
 

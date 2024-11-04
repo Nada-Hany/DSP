@@ -1,3 +1,8 @@
+import files, math, cmath
+from utils import ReadSignal
+import numpy as np
+
+
 staticPath_task1 = './files/task1/'
 staticPath_task2 = './files/task2/'
 staticPath_task3 = './files/task3/'
@@ -129,3 +134,126 @@ def QuantizationTest1(file_name,Your_EncodedValues,Your_QuantizedValues):
             return
     print("QuantizationTest1 Test case passed successfully")
 
+
+
+#Use to test the Amplitude of DFT and IDFT
+def SignalComapreAmplitude(SignalInput = [] ,SignalOutput= []):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        print('in compare function ,, difference between actual and generated')
+        for i in range(len(SignalInput)):
+            print(i, ' -- ', SignalInput[i]-SignalOutput[i])
+            if abs(SignalInput[i]-SignalOutput[i])>0.001:
+                return False
+            elif SignalInput[i]!=SignalOutput[i]:
+                return False
+        return True
+
+def RoundPhaseShift(P):
+    while P<0:
+        p+=2*math.pi
+    return float(P%(2*math.pi))
+
+#Use to test the PhaseShift of DFT
+def SignalComaprePhaseShift(SignalInput = [] ,SignalOutput= []):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        for i in range(len(SignalInput)):
+            A=round(SignalInput[i])
+            B=round(SignalOutput[i])
+            if abs(A-B)>0.0001:
+                return False
+            elif A!=B:
+                return False
+        return True
+
+
+
+
+
+def getComponents(signal : ReadSignal, inverse = None):
+
+        sign = 1 if inverse else -1
+        scale = 1/signal.sampleNo if inverse else 1
+
+        result = []
+        components = []
+        N = signal.sampleNo
+        for k in range(N): 
+            sum_real = 0
+            sum_imag = 0
+            for n in range(N):
+                angle = 2 * math.pi * k * n / N
+                sum_real += signal.x[n] * math.cos(sign * angle)
+                sum_imag += signal.x[n] * math.sin(sign * angle)
+
+            result.append((scale * sum_real, scale * sum_imag))
+            amplitudes = [abs(complex(r, i)) for r, i in result]
+            phases = [math.atan2(i, r) for r, i in result]
+        idft_input = [a * math.cos(p) for a, p in zip(amplitudes, phases)]
+        # idft_result = dft_idft(idft_input, inverse=True)
+        return amplitudes, phases
+  
+def compute_dft(data, sample_freq):
+    N = len(data)
+    freq_comp = []
+    for k in range(N):
+        real_sum = 0
+        img_sum = 0
+        for n in range(N):
+            angle = -2 * np.pi * k * n / N
+            real_sum += data[n] * np.cos(angle)
+            img_sum += data[n] * np.sin(angle)
+        freq_comp.append(complex(real_sum, img_sum))
+    freqs = np.arange(N) * (sample_freq / N)
+    amp = np.abs(freq_comp)
+    phases = np.angle(freq_comp)
+    return freq_comp, freqs, amp, phases
+
+
+
+
+def dft(signal, Fs, inverse):
+    indicies = []
+    samples = []  
+    for x, y in signal:
+        indicies.append(x)
+        samples.append(y)
+
+    N = len(samples)
+    real = np.zeros(N)
+    imag = np.zeros(N)
+    rev = np.zeros(N)
+
+    if inverse:
+        for k in range(N):
+            amp = indicies[k]      
+            theta = samples[k]    
+            real[k] = amp * np.cos(theta)
+            imag[k] = amp * np.sin(theta)
+
+    for n in range(N):
+        for k in range(N):
+            angle = 2 * np.pi * k * n / N if inverse else -2 * np.pi * k * n / N
+
+            if not inverse:
+                real[k] += samples[n] * np.cos(angle)
+                imag[k] += samples[n] * np.sin(angle)
+            
+           
+            else:
+                rev[n] += real[k] * np.cos(angle) - imag[k] * np.sin(angle)
+
+   
+    if not inverse:
+        amp = np.sqrt(real*2 + imag*2)
+        phase = np.arctan2(imag, real)
+        fundamental_freq = (2 * np.pi) / (N / Fs)
+        frequencies = np.arange(1, N + 1) * fundamental_freq
+        return frequencies, amp, phase
+
+    
+    else:
+       return np.arange(N), rev / N

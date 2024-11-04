@@ -1,4 +1,4 @@
-import os 
+import os , re
 from utils import ReadSignal, ConstructedSignal
 
 def getFile(path):
@@ -39,7 +39,8 @@ def readStructure(fileName):
     list = []
     file = open(fileName, "r")
     for line in file:
-        tmp = line.strip().split()
+        tmp = re.split(r'[ ,]', line.strip())
+        # tmp = line.strip().split()
         if len(tmp) == 1:
             list.append(tmp[0])
         elif len(tmp) == 2:

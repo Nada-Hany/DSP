@@ -24,8 +24,8 @@ class ReadSignal:
         self.signalType = signalType
         self.isPeriodic = isPeriodic
         self.sampleNo = int(sampleNo)
-        self.y = [float(i) for i in y]
-        self.x = [float(i) for i in x]
+        self.y = [float(i.rstrip("f")) for i in y]
+        self.x = [float(i.rstrip("f")) for i in x]
         self.intervals = []
         self.midpoints = []
         self.error = []
