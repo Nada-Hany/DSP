@@ -74,16 +74,13 @@ class Task4:
         real = np.zeros(N)
         imag = np.zeros(N)
         inv = np.zeros(N)
-        exponent = np.zeros(N)
-        complex = np.zeros(N)
-
+        
         if inverse:
             for i in range(N):
                 amp = signal.x[i]
                 theta = signal.y[i]
                 real[i] = amp * math.cos(theta)
                 imag[i] = amp * math.sin(theta)
-                complex[i] =  real[i] + 1j * imag[i]
 
         for k in range(N): 
             sum_real = 0
@@ -94,8 +91,7 @@ class Task4:
                     sum_real += signal.y[n] * math.cos(power)
                     sum_imag += signal.y[n] * math.sin(power)
                 else:
-                    # inv[k] += real[n] * np.cos(power) - imag[n] * np.sin(power)
-                    # exponent[k] = np.exp(2j * np.pi * k * n / N)
+                   
                     inv[k] += real[n] * np.cos(power) - imag[n] * np.sin(power)
 
             result.append((scale * sum_real, scale * sum_imag))
@@ -105,6 +101,25 @@ class Task4:
             # return self.calulate_IDFT(complex)
             return inv / N
     
+    
+    def compute_dft(self, signal):
+        N = signal.sampleNo
+        dft_result = np.zeros(N, dtype=complex)
+
+        for k in range(N):
+            sum_real = 0  # Sum of real parts
+            sum_imag = 0  # Sum of imaginary parts
+            for n in range(N):
+                angle = -2 * np.pi * k * n / N
+                sum_real += signal.x[n] * np.cos(angle)
+                sum_imag += signal.x[n] * np.sin(angle)
+            dft_result[k] = sum_real + 1j * sum_imag
+
+        # Calculate amplitudes and phases
+        amplitudes = np.sqrt(np.real(dft_result)**2 + np.imag(dft_result)**2)
+        phases = np.arctan2(np.imag(dft_result), np.real(dft_result))  # Correct quadrant
+
+        return amplitudes, phases
 
     def get_amp_phase(self, data):
         amp = []
@@ -131,6 +146,7 @@ class Task4:
             self.signals[0].x = freq
             self.signals[0].y = phase
 
+            amp, phase = self.compute_dft(self.signals[0])
             self.graph.discreteGraph(self.DFT_frame, self.signals)
             print(test.SignalComaprePhaseShift(self.phase_DFT, phase))
             print("phase test ^^^ ")
@@ -154,7 +170,9 @@ class Task4:
         if len(self.signals) == 1:
             res = self.getComponents(self.signals[0], 1)
             reconstructed_samples = np.round(np.real(res), decimals=0).tolist()  
+            
             self.signals[0].x = [i for i in range(self.signals[0].sampleNo)]
+            # self.signals[0].x = [(i * np.pi * 4 / ) for i in range(self.signals[0].sampleNo)]
             self.signals[0].y = reconstructed_samples
             print(test.SignalComapreAmplitude(self.sample_IDFT, reconstructed_samples))    
             print('idft test ^^^')
