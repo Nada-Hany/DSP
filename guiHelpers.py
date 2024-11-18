@@ -61,10 +61,8 @@ class Graph:
         self.plot.clear()
          
     def discreteGraph(self, root, signals, x = None, y = None):
-        # self.plot.close(self.fig)
         self.fig = Figure(figsize=(5, 2.1), dpi=100)
         self.plot = self.fig.add_subplot(1, 1, 1)
-
     
         for i in range(len(signals)):
             

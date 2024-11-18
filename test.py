@@ -8,37 +8,37 @@ staticPath_task2 = './files/task2/'
 staticPath_task3 = './files/task3/'
 
 
-def SignalSamplesAreEqual(file_name,indices,samples):
-    expected_indices=[]
-    expected_samples=[]
-    with open(file_name, 'r') as f:
-        line = f.readline()
-        line = f.readline()
-        line = f.readline()
-        line = f.readline()
-        while line:
-            # process line
-            L=line.strip()
-            if len(L.split(' '))==2:
-                L=line.split(' ')
-                V1=int(L[0])
-                V2=float(L[1])
-                expected_indices.append(V1)
-                expected_samples.append(V2)
-                line = f.readline()
-            else:
-                break
+# def SignalSamplesAreEqual(file_name,indices,samples):
+#     expected_indices=[]
+#     expected_samples=[]
+#     with open(file_name, 'r') as f:
+#         line = f.readline()
+#         line = f.readline()
+#         line = f.readline()
+#         line = f.readline()
+#         while line:
+#             # process line
+#             L=line.strip()
+#             if len(L.split(' '))==2:
+#                 L=line.split(' ')
+#                 V1=int(L[0])
+#                 V2=float(L[1])
+#                 expected_indices.append(V1)
+#                 expected_samples.append(V2)
+#                 line = f.readline()
+#             else:
+#                 break
 
-    if len(expected_samples)!=len(samples):
-        print("Test case failed, your signal have different length from the expected one")
-        return
-    for i in range(len(expected_samples)):
-        if abs(samples[i] - expected_samples[i]) < 0.01:
-            continue
-        else:
-            print("Test case failed, your signal have different values from the expected one") 
-            return
-    print("Test case passed successfully")
+#     if len(expected_samples)!=len(samples):
+#         print("Test case failed, your signal have different length from the expected one")
+#         return
+#     for i in range(len(expected_samples)):
+#         if abs(samples[i] - expected_samples[i]) < 0.01:
+#             continue
+#         else:
+#             print("Test case failed, your signal have different values from the expected one") 
+#             return
+#     print("Test case passed successfully")
 
 
 
@@ -171,165 +171,131 @@ def SignalComaprePhaseShift(SignalInput = [] ,SignalOutput= []):
 
 
 
-
-
-def getComponents(signal : ReadSignal, inverse = None):
-
-        sign = 1 if inverse else -1
-        scale = 1/signal.sampleNo if inverse else 1
-
-        result = []
-        components = []
-        N = signal.sampleNo
-        for k in range(N): 
-            sum_real = 0
-            sum_imag = 0
-            for n in range(N):
-                angle = 2 * math.pi * k * n / N
-                sum_real += signal.x[n] * math.cos(sign * angle)
-                sum_imag += signal.x[n] * math.sin(sign * angle)
-
-            result.append((scale * sum_real, scale * sum_imag))
-            amplitudes = [abs(complex(r, i)) for r, i in result]
-            phases = [math.atan2(i, r) for r, i in result]
-        idft_input = [a * math.cos(p) for a, p in zip(amplitudes, phases)]
-        # idft_result = dft_idft(idft_input, inverse=True)
-        return amplitudes, phases
-  
-def compute_dft(data, sample_freq):
-    N = len(data)
-    freq_comp = []
-    for k in range(N):
-        real_sum = 0
-        img_sum = 0
-        for n in range(N):
-            angle = -2 * np.pi * k * n / N
-            real_sum += data[n] * np.cos(angle)
-            img_sum += data[n] * np.sin(angle)
-        freq_comp.append(complex(real_sum, img_sum))
-    freqs = np.arange(N) * (sample_freq / N)
-    amp = np.abs(freq_comp)
-    phases = np.angle(freq_comp)
-    return freq_comp, freqs, amp, phases
-
-
-
-
-def dft(signal, Fs, inverse):
-    indicies = []
-    samples = []  
-    for x, y in signal:
-        indicies.append(x)
-        samples.append(y)
-
-    N = len(samples)
-    real = np.zeros(N)
-    imag = np.zeros(N)
-    rev = np.zeros(N)
-
-    if inverse:
-        for k in range(N):
-            amp = indicies[k]      
-            theta = samples[k]    
-            real[k] = amp * np.cos(theta)
-            imag[k] = amp * np.sin(theta)
-
-    for n in range(N):
-        for k in range(N):
-            angle = 2 * np.pi * k * n / N if inverse else -2 * np.pi * k * n / N
-
-            if not inverse:
-                real[k] += samples[n] * np.cos(angle)
-                imag[k] += samples[n] * np.sin(angle)
-            
-           
+def SignalSamplesAreEqual(file_name,indices,samples):
+    expected_indices=[]
+    expected_samples=[]
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
             else:
-                rev[n] += real[k] * np.cos(angle) - imag[k] * np.sin(angle)
+                break
+                
+    if len(expected_samples)!=len(samples):
+        print("Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(expected_samples)):
+        if abs(samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print("Test case failed, your signal have different values from the expected one") 
+            return
+    print("Test case passed successfully")
 
-   
-    if not inverse:
-        amp = np.sqrt(real*2 + imag*2)
-        phase = np.arctan2(imag, real)
-        fundamental_freq = (2 * np.pi) / (N / Fs)
-        frequencies = np.arange(1, N + 1) * fundamental_freq
-        return frequencies, amp, phase
+
+
+
+def Shift_Fold_Signal(file_name,Your_indices,Your_samples):      
+    expected_indices=[]
+    expected_samples=[]
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
+            else:
+                break
+    print("Current Output Test file is: ")
+    print(file_name)
+    print("\n")
+    if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
+        print("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(Your_indices)):
+        if(Your_indices[i]!=expected_indices[i]):
+            print("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one") 
+            print(f"my index > {Your_indices[i]} --- expected index > {expected_indices[i]}")
+            return
+    for i in range(len(expected_samples)):
+        if abs(Your_samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print(f"my smaple > {Your_samples[i]} --- expected smaple > {expected_samples[i]}")
+            print("Shift_Fold_Signal Test case failed, your signal have different values from the expected one") 
+            return
+    print("Shift_Fold_Signal Test case passed successfully")
+
+
+
+
+
+def  DerivativeSignal(first_drevative, second_derivative):
+    InputSignal=[1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 , 16 , 17 , 18 , 19 , 20 , 21 , 22 , 23 , 24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 , 32 , 33 , 34 , 35 , 36 , 37 , 38 , 39 , 40 , 41 , 42 , 43 , 44 , 45 , 46 , 47 , 48 , 49 , 50 , 51 , 52 , 53 , 54 , 55 , 56 , 57 , 58 , 59 , 60 , 61 , 62 , 63 , 64 , 65 , 66 , 67 , 68 , 69 , 70 , 71 , 72 , 73 , 74 , 75 , 76 , 77 , 78 , 79 , 80 , 81 , 82 , 83 , 84 , 85 , 86 , 87 , 88 , 89 , 90 , 91 , 92 , 93 , 94 , 95 , 96 , 97 , 98 , 99 , 100 ]  
+    expectedOutput_first = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    expectedOutput_second = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     
+    """
+    Write your Code here:
+    Start
+    """
+  
+    FirstDrev=first_drevative
+    SecondDrev=second_derivative
+    
+    
+    
+    
+    """
+    End
+    """
+    
+    """
+    Testing your Code
+    """
+    if( (len(FirstDrev)!=len(expectedOutput_first)) or (len(SecondDrev)!=len(expectedOutput_second))):
+        print("mismatch in length") 
+        return
+    first=second=True
+    for i in range(len(expectedOutput_first)):
+        if abs(FirstDrev[i] - expectedOutput_first[i]) < 0.01:
+            continue
+        else:
+            first=False
+            print("1st derivative wrong")
+            return
+    for i in range(len(expectedOutput_second)):
+        if abs(SecondDrev[i] - expectedOutput_second[i]) < 0.01:
+            continue
+        else:
+            second=False
+            print("2nd derivative wrong") 
+            return
+    if(first and second):
+        print("Derivative Test case passed successfully")
     else:
-       return np.arange(N), rev / N
-    
+        print("Derivative Test case failed")
+    return
 
 
-    # elif transform_type == 'IDFT':
-    #         amp, phase = self.read_reference_data()
-    #         if not amp or not phase:
-    #             print("Error: No amplitude or phase data read from the reference file.")
-    #             return
-
-    #         sampling_frequency = simpledialog.askfloat("Input", "Enter the sampling frequency in Hz:", minvalue=1.0)
-    #         if sampling_frequency is None:
-    #             return
-
-    #         amp = np.array(amp)
-    #         phase = np.array(phase)
-
-    #         real_part = amp * np.cos(phase)
-    #         imaginary_part = amp * np.sin(phase)
-    #         complex_spectrum = real_part + 1j * imaginary_part
-
-    #         reconstructed_signal = self.fourier_transform(complex_spectrum, inverse=True)
-    #         reconstructed_amplitude = np.round(np.real(reconstructed_signal), decimals=0).tolist()
-
-    #         reference_time, reference_signal = self.read_signals_from_txt_files()
-    #         reference_signal = reference_signal[0].tolist()
-
-    #         recon_amplitude_comparison = SignalComapreAmplitude(reconstructed_amplitude, reference_signal)
-
-    #         if recon_amplitude_comparison:
-    #             print("Reconstructed Amplitude comparison passed successfully.")
-    #         else:
-    #             print("Reconstructed Amplitude comparison failed.")
-    #         elif transform_type == 'IDFT':
-    #         amp, phase = self.read_reference_data()
-    #         if not amp or not phase:
-    #             print("Error: No amplitude or phase data read from the reference file.")
-    #             return
-
-    #         sampling_frequency = simpledialog.askfloat("Input", "Enter the sampling frequency in Hz:", minvalue=1.0)
-    #         if sampling_frequency is None:
-    #             return
-
-    #         amp = np.array(amp)
-    #         phase = np.array(phase)
-
-    #         real_part = amp * np.cos(phase)
-    #         imaginary_part = amp * np.sin(phase)
-    #         complex_spectrum = real_part + 1j * imaginary_part
-
-    #         reconstructed_signal = self.fourier_transform(complex_spectrum, inverse=True)
-    #         reconstructed_amplitude = np.round(np.real(reconstructed_signal), decimals=0).tolist()
-
-    #         reference_time, reference_signal = self.read_signals_from_txt_files()
-    #         reference_signal = reference_signal[0].tolist()
-
-    #         recon_amplitude_comparison = SignalComapreAmplitude(reconstructed_amplitude, reference_signal)
-
-    #         if recon_amplitude_comparison:
-    #             print("Reconstructed Amplitude comparison passed successfully.")
-    #         else:
-    #             print("Reconstructed Amplitude comparison failed.")
-
-
-    #     def fourier_transform(self, signal, inverse=False):
-    #         N = len(signal)
-    #         k = np.arange(N)
-    #         n = np.arange(N)
-    #         # Exponential factor
-    #         if inverse:
-    #             factor = 1 / N
-    #             exponent = np.exp(2j * np.pi * k[:, None] * n / N)  # IDFT
-    #         else:
-    #             factor = 1
-    #             exponent = np.exp(-2j * np.pi * k[:, None] * n / N)  # DFT
-
-    #         return factor * np.dot(exponent, signal)  # Compute DFT or IDFT
