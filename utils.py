@@ -1,5 +1,5 @@
 from tkinter import filedialog
-
+import numpy as np
 
 class Button:
     def __init__(self, x, y, name, onClick):
@@ -87,7 +87,28 @@ def browse_file():
 
 
 
+def DFT(signal):
+    N = signal.sampleNo
+    res = []
+    for k in range(N):
+        realSum = 0
+        imagSum = 0
+        for n in range(N):
+            angle = -2 * np.pi * k * n / N
+            realSum += signal.y[n] * np.cos(angle)
+            imagSum += signal.y[n] * np.sin(angle)
+        res.append(complex(realSum, imagSum))
+    return res
 
+
+def IDFT(signal, freq_domain):
+    N = len(freq_domain)
+    signal = []
+    for n in range(N):
+        real = sum(freq_domain[k].real * np.cos(2 * np.pi * k * n / N) - 
+                    freq_domain[k].imag * np.sin(2 * np.pi * k * n / N) for k in range(N))
+        signal.append(real / N)
+    return signal
 
 
     

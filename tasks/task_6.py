@@ -62,31 +62,6 @@ class Task6:
             tmp.place(x=btn.x, y=btn.y)
             
         return  left_frame, right_frame
-    
-
-    def DFT (self):
-        signal = self.signals[0]
-        N = signal.sampleNo
-        res = []
-        for k in range(N):
-            realSum = 0
-            imagSum = 0
-            for n in range(N):
-                angle = -2 * np.pi * k * n / N
-                realSum += signal.y[n] * np.cos(angle)
-                imagSum += signal.y[n] * np.sin(angle)
-            res.append(complex(realSum, imagSum))
-        return res
-
-
-    def IDFT(self, freq_domain):
-        N = len(freq_domain)
-        signal = []
-        for n in range(N):
-            real = sum(freq_domain[k].real * np.cos(2 * np.pi * k * n / N) - 
-                        freq_domain[k].imag * np.sin(2 * np.pi * k * n / N) for k in range(N))
-            signal.append(real / N)
-        return signal
 
 
     def to_DC_removale_frame(self):
@@ -94,11 +69,12 @@ class Task6:
         self.DC_removale_frame = guiHelpers.right_frame(self.right_section)
         noSignalError = tk.Label(self.DC_removale_frame, text="please read a signal first")
         if len(self.signals) == 1:
-            freq_domain = self.DFT()
+            signal = self.signals[0]
+            freq_domain = utils.DFT(signal)
             freq_domain[0] = 0
-            self.signals[0].y = self.IDFT(freq_domain)
+            self.signals[0].y = utils.IDFT(signal, freq_domain)
             self.signals[0].y = [round(i, 3) for i in self.signals[0].y]
-            print(self.signals[0].y)
+            print("DC removale output: ", self.signals[0].y)
             test.SignalSamplesAreEqual(f"{staticPath}DC_component_output.txt", self.signals[0].x, self.signals[0].y)
             # self.graph.discreteGraph(self.DC_removale_frame, self.signals)
         else:
@@ -121,7 +97,6 @@ class Task6:
 
 
     def smooth_signal(self, entry):
-
         noSignalError = tk.Label(self.smothing_frame, text="please enter a valid number")
         if not entry.get() or not utils.is_int(entry.get()):
             noSignalError.place(x=200,y=100)
@@ -138,7 +113,7 @@ class Task6:
             
             result = [round(i) for i in result]
             signal.y = result
-            print(result)
+            print("smoothed signal: ", result)
             if(windowSize == 3):
                 test.SignalSamplesAreEqual(f"{staticPath}OutMovAvgTest1.txt", signal.x, signal.y)
             else:
@@ -154,42 +129,54 @@ class Task6:
             signal_1 = self.signals[0]
             signal_2 = self.signals[1]
 
-            min_ = min(min(signal_1.x), min(signal_2.x))
-            
-            n_min = min(range(len(signal_1.y))) + min(range(len(signal_2.y)))
-            n_max = max(range(len(signal_1.y))) + max(range(len(signal_2.y)))
-
-            y = []
-            for n in range(n_min, n_max + 1):
-                sum_val = 0
-                for k in range(len(signal_1.y)):
-                    if 0 <= n - k < len(signal_2.y):  
-                        sum_val += signal_1.y[k] * signal_2.y[n - k]
-                
-                result_index = min_ + n  
-                y.append((int(result_index), int(sum_val)))
-
             N1 = signal_1.sampleNo
             N2 = signal_2.sampleNo
-            len_result = N1 + N2 - 1
 
+            len_result = N1 + N2 - 1
             result = [0] * len_result
+            indices = [0] * len_result
 
             # calculate convolution
-            for n in range(len_result):
-                for m in range(N1):
-                    if 0 <= n - m < N2:
-                        result[n] += signal_1.y[n - m] * signal_2.y[m]
-
-            print(result)
-            # print(y[1])
-
+            for i in range(N1):
+                for j in range(N2):
+                    indices[i+j] = signal_1.x[i] + signal_2.x[j]
+                    result[i + j] += signal_1.y[i] * signal_2.y[j]
+            
+            print("convolution")
+            print("indices: ", indices)
+            print("values: ", result)
+            test.ConvTest(indices, result)
         else:
             noSignalError.place(x=200,y=200)
     
 
     def to_correlation_frame(self):
-        pass
+        self.destroyFrames()
+        self.smothing_frame = guiHelpers.right_frame(self.right_section)
+        noSignalError = tk.Label(self.smothing_frame, text="please read a signal first")
+
+        if len(self.signals) == 2:
+            signal_1 = self.signals[0]
+            signal_2 = self.signals[1]
+
+            N = signal_1.sampleNo
+
+            # Pre-compute squared sums for normalization
+            X1_squared_sum = np.sum(i**2 for i in signal_1.y)
+            X2_squared_sum = np.sum(i**2 for i in signal_2.y)
+            normalization = np.sqrt(X1_squared_sum * X2_squared_sum)
+
+   
+            r12 = []
+            for j in range(N):
+                numerator = sum(signal_1.y[i] * signal_2.y[(i + j) % N] for i in range(N))  
+                r12.append(numerator / normalization)
+
+            r12 = np.array(r12)
+            print("correlation values: ", r12)
+            test.SignalSamplesAreEqual(f"{staticPath}CorrOutput.txt", signal_1.x, r12)
+        else:
+            noSignalError.place(x=200,y=200)
 
 
     def select_files(self):
