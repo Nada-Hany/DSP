@@ -74,9 +74,16 @@ class Task6:
             freq_domain[0] = 0
             self.signals[0].y = utils.IDFT(signal, freq_domain)
             self.signals[0].y = [round(i, 3) for i in self.signals[0].y]
-            print("DC removale output: ", self.signals[0].y)
+            print("DC removale output frequency domain: ", self.signals[0].y)
             test.SignalSamplesAreEqual(f"{staticPath}DC_component_output.txt", self.signals[0].x, self.signals[0].y)
             # self.graph.discreteGraph(self.DC_removale_frame, self.signals)
+
+            N = signal.sampleNo
+            mean = sum(signal.y) / N
+            self.signals[0].y = [(i - mean) for i in signal.y]
+            self.signals[0].y = [round(i, 3) for i in self.signals[0].y]
+            print("DC removale output time domain: ", self.signals[0].y)
+            test.SignalSamplesAreEqual(f"{staticPath}DC_component_output.txt", self.signals[0].x, self.signals[0].y)
         else:
             noSignalError.place(x=200,y=200)
 
