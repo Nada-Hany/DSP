@@ -1,5 +1,8 @@
 from tkinter import filedialog
 import numpy as np
+import math 
+
+
 
 class Button:
     def __init__(self, x, y, name, onClick):
@@ -31,6 +34,33 @@ class ReadSignal:
         self.error = []
         self.quantization = []
         self.encoded = []
+
+
+class FilterConfig:
+    def __init__(self):
+        self.filter_type = None
+        self.fs = None
+        self.stop_band_attenuation = None
+        self.fc = None
+        self.transition_band = None
+
+    def read_from_file(self, filename):
+        file = open(filename, 'r')
+        for line in file:
+            key, value = line.strip().split('=')
+            key = key.strip()
+            value = value.strip()
+
+            if key == "FilterType":
+                self.filter_type = value
+            elif key == "FS":
+                self.fs = int(value)
+            elif key == "StopBandAttenuation":
+                self.stop_band_attenuation = int(value)
+            elif key == "FC":
+                self.fc = int(value)
+            elif key == "TransitionBand":
+                self.transition_band = int(value)
 
 
 #check if all field are entered by the user
@@ -111,4 +141,87 @@ def IDFT(signal, freq_domain):
     return signal
 
 
+
+def lowpass(n, fs, fc, f2 = 0):
+    angle = n * 2 * fc * math.pi / fs
+    return 2 * fc * (np.sin(angle)) / (angle) if n != 0 else 2 * fc
+
+
+def highpass(n, fs, fc, f2 = 0):
+    angle = n * 2 * fc * math.pi / fs
+    return -2 * fc * (np.sin(angle) / angle) if n != 0 else 1 - 2 * fc
+
+
+def bandpass(n, fs, f1, f2):
+    w1 = 2 * math.pi * f1 / fs
+    w2 = 2 * math.pi * f2 / fs
+    if n != 0:
+        return (2 * f2 * (np.sin(n * w2) / (n * w2))) - (2 * f1 * (np.sin(n * w1) / (n * w1)))
+    else:
+        return 2 * (f2 - f1)
+
+
+def bandstop(n, fs, f1, f2):
+    w1 = 2 * math.pi * f1 / fs
+    w2 = 2 * math.pi * f2 / fs
+    if n != 0:
+        return (2 * f1 * (np.sin(n * w1) / (n * w1))) - (2 * f2 * (np.sin(n * w2) / (n * w2)))
+    else:
+        return 1 - 2 * (f2 - f1)
     
+
+
+def rectangular_window(n, N):
+    return 1
+
+
+def hanning_window(n, N):
+    return 0.5 + 0.5 * np.cos((2 * np.pi * n) / N)
+
+
+def hamming_window(n, N):
+    return 0.54 + 0.46 * np.cos((2 * np.pi * n) / N)
+
+
+def blackman_window(n, N):
+    return 0.42 + 0.5 * np.cos((2 * np.pi * n) / (N - 1)) + 0.08 * np.cos((4 * np.pi * n) / (N - 1))
+
+
+def getCoeffNumber(window, deltaF):
+    if window == "rectangular":
+        num = math.ceil(0.9/deltaF)
+    elif window == "hanning":
+        num = math.ceil(3.1/deltaF)
+    elif window == "hamming":
+        num = math.ceil(3.3/deltaF) 
+    elif window == "blackman":
+        num = math.ceil(5.5/deltaF) 
+    return num if num % 2 == 1 else num + 1 
+ 
+
+getH = {
+    "Low pass":lowpass, 
+    "High pass": highpass,
+    "Band pass": bandpass,
+    "Band stop": bandstop
+}
+    
+
+getW = {
+    "rectangular": rectangular_window,
+    "hanning": hanning_window,
+    "hamming": hamming_window, 
+    "blackman": blackman_window
+}
+
+def getWindowFunction(stopband):
+    if stopband <= 21:
+        return "rectangular"
+    elif stopband <= 44:
+        return "hanning"
+    elif stopband <= 53:
+        return "hamming"
+    elif stopband <= 74:
+        return "blackman"
+    else:
+        None

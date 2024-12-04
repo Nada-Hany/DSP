@@ -76,7 +76,6 @@ class Task6:
             self.signals[0].y = [round(i, 3) for i in self.signals[0].y]
             print("DC removale output frequency domain: ", self.signals[0].y)
             test.SignalSamplesAreEqual(f"{staticPath}DC_component_output.txt", self.signals[0].x, self.signals[0].y)
-            # self.graph.discreteGraph(self.DC_removale_frame, self.signals)
 
             N = signal.sampleNo
             mean = sum(signal.y) / N
@@ -84,6 +83,8 @@ class Task6:
             self.signals[0].y = [round(i, 3) for i in self.signals[0].y]
             print("DC removale output time domain: ", self.signals[0].y)
             test.SignalSamplesAreEqual(f"{staticPath}DC_component_output.txt", self.signals[0].x, self.signals[0].y)
+            
+            self.graph.discreteGraph(self.DC_removale_frame, self.signals)
         else:
             noSignalError.place(x=200,y=200)
 

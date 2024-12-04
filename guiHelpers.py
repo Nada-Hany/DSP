@@ -89,7 +89,7 @@ class Graph:
 
             self.plot.plot(x, y, color=f'{colors[i]}')  
         self.plot.grid(True)
-        
+         
         canvas = FigureCanvasTkAgg(self.fig, master=root)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
