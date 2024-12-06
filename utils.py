@@ -42,6 +42,7 @@ class FilterConfig:
         self.fs = None
         self.stop_band_attenuation = None
         self.fc = None
+        self.f2 = 0
         self.transition_band = None
 
     def read_from_file(self, filename):
@@ -58,7 +59,11 @@ class FilterConfig:
             elif key == "StopBandAttenuation":
                 self.stop_band_attenuation = int(value)
             elif key == "FC":
-                self.fc = int(value)
+                self.fc = int(value) 
+            elif key == "F1":
+                self.fc = int(value) 
+            elif key == "F2":
+                self.f2 = int(value) 
             elif key == "TransitionBand":
                 self.transition_band = int(value)
 
@@ -142,51 +147,43 @@ def IDFT(signal, freq_domain):
 
 
 
-def lowpass(n, fs, fc, f2 = 0):
-    angle = n * 2 * fc * math.pi / fs
-    return 2 * fc * (np.sin(angle)) / (angle) if n != 0 else 2 * fc
+# ------------------------- for FIR
 
-
-def highpass(n, fs, fc, f2 = 0):
-    angle = n * 2 * fc * math.pi / fs
-    return -2 * fc * (np.sin(angle) / angle) if n != 0 else 1 - 2 * fc
-
-
-def bandpass(n, fs, f1, f2):
-    w1 = 2 * math.pi * f1 / fs
-    w2 = 2 * math.pi * f2 / fs
-    if n != 0:
-        return (2 * f2 * (np.sin(n * w2) / (n * w2))) - (2 * f1 * (np.sin(n * w1) / (n * w1)))
-    else:
-        return 2 * (f2 - f1)
-
-
-def bandstop(n, fs, f1, f2):
-    w1 = 2 * math.pi * f1 / fs
-    w2 = 2 * math.pi * f2 / fs
-    if n != 0:
-        return (2 * f1 * (np.sin(n * w1) / (n * w1))) - (2 * f2 * (np.sin(n * w2) / (n * w2)))
-    else:
-        return 1 - 2 * (f2 - f1)
+def  getHVal(filter, n, fs, f1, f2 = 0):
+    fc = f1
+    angle = n * 2 * fc * math.pi 
+    w1 = 2 * math.pi * f1 
+    w2 = 2 * math.pi * f2 
+    if filter == 'Low pass':
+        return 2 * fc * (np.sin(angle)) / (angle) if n != 0 else 2 * fc
     
+    elif filter == "High pass":
+        return -2 * fc * (np.sin(angle) / angle) if n != 0 else 1 - 2 * fc
+    
+    elif filter == "Band pass":
+        if n != 0:
+            return (2 * f2 * (np.sin(n * w2) / (n * w2))) - (2 * f1 * (np.sin(n * w1) / (n * w1)))
+        else:
+            return 2 * (f2 - f1)
+        
+    elif filter == "Band stop":
+        if n != 0:
+            return (2 * f1 * (np.sin(n * w1) / (n * w1))) - (2 * f2 * (np.sin(n * w2) / (n * w2)))
+        else:
+            return 1 - 2 * (f2 - f1)
 
 
-def rectangular_window(n, N):
-    return 1
+def getWindowVal(window, n, N):
+    if window =="rectangular":
+        return 1
+    elif window == "hanning":
+        return 0.5 + 0.5 * np.cos((2 * np.pi * n) / N)
+    elif window == "hamming":
+        return 0.54 + 0.46 * np.cos((2 * np.pi * n) / N)
+    elif window == "blackman":
+        return 0.42 + 0.5 * np.cos((2 * np.pi * n) / (N - 1)) + 0.08 * np.cos((4 * np.pi * n) / (N - 1))
 
-
-def hanning_window(n, N):
-    return 0.5 + 0.5 * np.cos((2 * np.pi * n) / N)
-
-
-def hamming_window(n, N):
-    return 0.54 + 0.46 * np.cos((2 * np.pi * n) / N)
-
-
-def blackman_window(n, N):
-    return 0.42 + 0.5 * np.cos((2 * np.pi * n) / (N - 1)) + 0.08 * np.cos((4 * np.pi * n) / (N - 1))
-
-
+    
 def getCoeffNumber(window, deltaF):
     if window == "rectangular":
         num = math.ceil(0.9/deltaF)
@@ -198,21 +195,6 @@ def getCoeffNumber(window, deltaF):
         num = math.ceil(5.5/deltaF) 
     return num if num % 2 == 1 else num + 1 
  
-
-getH = {
-    "Low pass":lowpass, 
-    "High pass": highpass,
-    "Band pass": bandpass,
-    "Band stop": bandstop
-}
-    
-
-getW = {
-    "rectangular": rectangular_window,
-    "hanning": hanning_window,
-    "hamming": hamming_window, 
-    "blackman": blackman_window
-}
 
 def getWindowFunction(stopband):
     if stopband <= 21:

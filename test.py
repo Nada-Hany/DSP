@@ -8,40 +8,6 @@ staticPath_task2 = './files/task2/'
 staticPath_task3 = './files/task3/'
 
 
-# def SignalSamplesAreEqual(file_name,indices,samples):
-#     expected_indices=[]
-#     expected_samples=[]
-#     with open(file_name, 'r') as f:
-#         line = f.readline()
-#         line = f.readline()
-#         line = f.readline()
-#         line = f.readline()
-#         while line:
-#             # process line
-#             L=line.strip()
-#             if len(L.split(' '))==2:
-#                 L=line.split(' ')
-#                 V1=int(L[0])
-#                 V2=float(L[1])
-#                 expected_indices.append(V1)
-#                 expected_samples.append(V2)
-#                 line = f.readline()
-#             else:
-#                 break
-
-#     if len(expected_samples)!=len(samples):
-#         print("Test case failed, your signal have different length from the expected one")
-#         return
-#     for i in range(len(expected_samples)):
-#         if abs(samples[i] - expected_samples[i]) < 0.01:
-#             continue
-#         else:
-#             print("Test case failed, your signal have different values from the expected one") 
-#             return
-#     print("Test case passed successfully")
-
-
-
 def QuantizationTest2(file_name,Your_IntervalIndices,Your_EncodedValues,Your_QuantizedValues,Your_SampledError):
     expectedIntervalIndices=[]
     expectedEncodedValues=[]
@@ -204,8 +170,6 @@ def SignalSamplesAreEqual(file_name,indices,samples):
     print("Test case passed successfully")
 
 
-
-
 def Shift_Fold_Signal(file_name,Your_indices,Your_samples):      
     expected_indices=[]
     expected_samples=[]
@@ -245,9 +209,6 @@ def Shift_Fold_Signal(file_name,Your_indices,Your_samples):
             print("Shift_Fold_Signal Test case failed, your signal have different values from the expected one") 
             return
     print("Shift_Fold_Signal Test case passed successfully")
-
-
-
 
 
 def  DerivativeSignal(first_drevative, second_derivative):
@@ -327,3 +288,10 @@ def ConvTest(Your_indices,Your_samples):
             print("Conv Test case failed, your signal have different values from the expected one") 
             return
     print("Conv Test case passed successfully")
+
+
+
+# edge = 10
+# x = [i in range(-1*edge, edge)]
+# for i in range(0,5):
+#     print(i)
