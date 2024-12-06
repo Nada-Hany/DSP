@@ -44,6 +44,10 @@ class FilterConfig:
         self.fc = None
         self.f2 = 0
         self.transition_band = None
+        self.N = None
+        self.deltaF = None
+        self.edge = None
+        self.window = None
 
     def read_from_file(self, filename):
         file = open(filename, 'r')
@@ -66,6 +70,26 @@ class FilterConfig:
                 self.f2 = int(value) 
             elif key == "TransitionBand":
                 self.transition_band = int(value)
+
+
+class ReSampling:
+    def __init__(self):
+        self.L = None
+        self.M = None
+
+    def read_from_file(self, filename):
+            file = open(filename, 'r')
+            for line in file:
+                # print(line.strip().split('='))
+                parts = line.strip().split('=')
+                if len(parts) == 2:
+                    key = parts[0].strip()
+                    value = parts[1].strip()
+
+                    if key == "L (Upsampling Factor)":
+                        self.L = int(value)
+                    elif key == "M (Downsampling Factor)":
+                        self.M = int(value)
 
 
 #check if all field are entered by the user
@@ -145,6 +169,23 @@ def IDFT(signal, freq_domain):
         signal.append(real / N)
     return signal
 
+
+
+def calculate_convolution(x1, y1, x2, y2):
+    N1 = len(x1)
+    N2 = len(x2)
+
+    len_result = N1 + N2 - 1
+    result = [0] * len_result
+    indices = [0] * len_result
+
+    
+    for i in range(N1):
+        for j in range(N2):
+            indices[i + j] = x1[i] + x2[j]
+            result[i + j] += y1[i] * y2[j]
+
+    return indices, result
 
 
 # ------------------------- for FIR
