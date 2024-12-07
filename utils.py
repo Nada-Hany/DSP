@@ -185,6 +185,10 @@ def calculate_convolution(x1, y1, x2, y2):
             indices[i + j] = x1[i] + x2[j]
             result[i + j] += y1[i] * y2[j]
 
+    while result and result[-1] == 0:
+        result.pop()
+        indices.pop()
+        
     return indices, result
 
 

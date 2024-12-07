@@ -43,7 +43,7 @@ class Task6:
         back_btn = tk.Button(left_frame, text="back",compound=tk.CENTER, command= lambda:self.goBack(), width=3, height=1, borderwidth=0)
         back_btn.place(x= btn_x, y=guiHelpers.back_btn_y)
 
-        # far2 80 ben kol button w el tany
+        # 80 difference between each button
         read_signal_btn = Button(btn_x, 40, "Read Signal", lambda:self.select_files())
         DC_removale_btn = Button(btn_x, 120, "DC removale", lambda:self.to_DC_removale_frame())
         smooth_signal_btn = Button(btn_x, 200, "smooth signal", lambda:self.to_smooth_signal_frame())

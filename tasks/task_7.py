@@ -29,7 +29,7 @@ fileName_FIR = {
 fileName_sampling = {
     1:"/Sampling_Down.txt",
     2:"/Sampling_Up.txt",
-    3:"/Sampling_Up_Down.txt",
+    3:"/edited_spaces.txt",
 }
 
 class Task7:
@@ -65,7 +65,7 @@ class Task7:
 
         test_case_entry = ttk.Entry(left_frame)
         
-        # far2 80 ben kol button w el tany
+        # 80 difference between each button
         read_signal_btn = Button(btn_x, 40, "Read Signal", lambda:self.select_files())
         FIR_btn = Button(btn_x, 120, "FIR", lambda:self.to_FIR_frame(test_case_entry))
         sampling_btn = Button(btn_x, 200, "sampling", lambda:self.to_sampling_frame(test_case_entry))
@@ -74,8 +74,6 @@ class Task7:
         buttons.append(read_signal_btn)
         buttons.append(FIR_btn)
         buttons.append(sampling_btn)
-
-
 
         test_case_label = ttk.Label(left_frame, text="test case number")
         test_case_label.place(x=btn_x, y=250)
@@ -97,6 +95,7 @@ class Task7:
         self.filterConfig.N = utils.getCoeffNumber(self.filterConfig.window, self.filterConfig.deltaF)
         self.filterConfig.edge = int((self.filterConfig.N-1)/2)
 
+
     def to_FIR_frame(self, testCaseEntry):
         self.destroyFrames()
         self.FIR_frame = guiHelpers.right_frame(self.right_section)
@@ -105,23 +104,20 @@ class Task7:
         testCorr = utils.is_int(testCase) 
         convolve = testCorr and len(self.signals) == 1 and int(testCase)%2==0
         coeffOnly = testCorr and int(testCase)%2 != 0
-        # if convolve or coeffOnly:
-        if True:
+        if convolve or coeffOnly:
+        # if True:
             self.testCaseNum = int(testCase)
             self.calculate_FIR()
 
             # convolve signal if required 
             if (self.testCaseNum % 2 == 0 and self.FIR):
                 signal = self.signals[0]
-                self.indicies, self.coeff = utils.calculate_convolution(signal.x, signal.y, self.indicies, self.coeff)
+                self.indicies, self.coeff = utils.calculate_convolution(self.indicies, self.coeff, signal.x, signal.y,)
             print("-------------- output of FIR --------------")
             print("indices:\n", self.indicies)
             print("coefficients:\n", self.coeff)
             print("-------------- results --------------")
-            print(f"lenth of result = {len(self.coeff)}")
-            print(f"lenth of indicies = {len(self.indicies)}")
-   
-            test.SignalSamplesAreEqual(f"{staticPath}{FIR_path}{self.testCaseNum}{fileName_FIR[self.testCaseNum]}",self.indicies, self.coeff)
+            test.Compare_Signals(f"{staticPath}{FIR_path}{self.testCaseNum}{fileName_FIR[self.testCaseNum]}",self.indicies, self.coeff)
 
         else:
             noSignalError.place(x=200,y=200)
@@ -168,8 +164,8 @@ class Task7:
         self.sampling_frame = guiHelpers.right_frame(self.right_section)
         noSignalError = tk.Label(self.sampling_frame, text="please read a signal first")
         testCase = testCaseEntry.get()
-        # if utils.is_int(testCase) and len(self.signals) == 1:
-        if True:
+        if utils.is_int(testCase) and len(self.signals) == 1:
+        # if True:
             self.testCaseNum = int(testCase)
             self.FIR = False
             self.getFilterConfig(samplingPath)
@@ -179,10 +175,11 @@ class Task7:
             # should sample first before convolving [sampled signal with LP]
             print("-------------- output of sampling --------------")
             print("indices:\n", self.indicies)
-            print("coefficients:\n", self.coeff)
+            print("samples:\n", self.coeff)
             print("-------------- results --------------")
             signal = self.signals[0]
-            test.SignalSamplesAreEqual(f"{staticPath}{samplingPath}{self.testCaseNum}{fileName_sampling[self.testCaseNum]}",signal.x, signal.y)
+
+            test.Compare_Signals(f"{staticPath}{samplingPath}{self.testCaseNum}{fileName_sampling[self.testCaseNum]}",signal.x, signal.y)
 
         else:
             noSignalError.place(x=200,y=200)
@@ -193,8 +190,7 @@ class Task7:
         L = self.resampler.L
         M = self.resampler.M
         first_index = int(signal.x[0])
-        print(f"sample numebr before sampling  == {len(self.signals[0].y)}")
-
+  
         # smapling up
         self.calculate_FIR()
         if L != 0 and M == 0:
@@ -202,19 +198,20 @@ class Task7:
             for sample in signal.y:
                 upsampled_signal.append(sample)  
                 upsampled_signal.extend([0] * (L - 1)) 
-            new_indices = [i for i in range(first_index, len(upsampled_signal)-first_index)]
+            new_indices = [i for i in range(first_index, len(upsampled_signal)-abs(first_index))]
+            
             self.signals[0].y = upsampled_signal
             self.signals[0].x = new_indices
-            print(f"sample numebr after sampling == y = {len(self.signals[0].y) } ,, x={len(new_indices)} ")
 
             self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff)
 
 
         # sampling down
         if L == 0 and M != 0:
-            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(signal.x, signal.y, self.indicies, self.coeff)
-            self.signals[0].x = self.signals[0].x[::M]
-
+            self.signals[0].x, self.signals[0].y = utils.calculate_convolution( self.indicies, self.coeff, signal.x, signal.y)
+            
+            n = int(len(self.signals[0].x[::M]))
+            self.signals[0].x = [i for i in range(int(self.signals[0].x[0]), n - abs(int(self.signals[0].x[0])))]
             downsampled_signal = self.signals[0].y[::M]
             self.signals[0].y = downsampled_signal
 
@@ -225,22 +222,15 @@ class Task7:
             for sample in signal.y:
                 upsampled_signal.append(sample)  
                 upsampled_signal.extend([0] * (L - 1)) 
-            new_indices = [i for i in range(first_index, len(upsampled_signal)-first_index)]
+            new_indices = [i for i in range(first_index, len(upsampled_signal)-abs(first_index))]
             
             self.signals[0].x = new_indices
             self.signals[0].y = upsampled_signal
 
-            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(signal.x, signal.y, self.indicies, self.coeff)
-
+            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff)
             self.signals[0].y = self.signals[0].y[::M]
-            self.signals[0].x  = self.signals[0].x[::M]
-
-
-        print(f"filter samples == {self.filterConfig.N}")
-        # self.signals[0].x = [i for i in range(0, len(self.signals[0].y))]
-        print("indicies after:\n", self.signals[0].x)
-        # print("samples after:\n", self.signals[0].y)
-
+            n = int(len(self.signals[0].x[::M]))
+            self.signals[0].x = [i for i in range(int(self.signals[0].x[0]), n - abs(int(self.signals[0].x[0])))]
 
 
     def select_files(self):
