@@ -169,8 +169,9 @@ class Task7:
             self.testCaseNum = int(testCase)
             self.FIR = False
             self.getFilterConfig(samplingPath)
+            # get L, M values 
             self.resampler.read_from_file(f'{staticPath}{samplingPath}{self.testCaseNum}/readme.txt')
-            # resample signal itself 
+
             self.resample()
             # should sample first before convolving [sampled signal with LP]
             print("-------------- output of sampling --------------")
