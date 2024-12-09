@@ -93,3 +93,13 @@ class Graph:
         canvas = FigureCanvasTkAgg(self.fig, master=root)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
+
+    def continousGraph(self, root, x, y):
+        self.fig = Figure(figsize=(6, 3), dpi=100)
+        self.plot = self.fig.add_subplot(1, 1, 1)
+        self.plot.plot(x, y, 'b-') 
+        self.plot.grid(True)
+         
+        canvas = FigureCanvasTkAgg(self.fig, master=root)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)

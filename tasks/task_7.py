@@ -117,6 +117,8 @@ class Task7:
             print("indices:\n", self.indicies)
             print("coefficients:\n", self.coeff)
             print("-------------- results --------------")
+            self.graph.continousGraph(self.FIR_frame, self.indicies, self.coeff)
+            files.write_FIR_result(self.indicies, self.coeff, self.testCaseNum)
             test.Compare_Signals(f"{staticPath}{FIR_path}{self.testCaseNum}{fileName_FIR[self.testCaseNum]}",self.indicies, self.coeff)
 
         else:
@@ -152,6 +154,8 @@ class Task7:
         for i in range(0, int(edge)+1):
             self.coeff.append(round(utils.getHVal(filter, i, fs, f1, f2) * utils.getWindowVal(window, i, N), 11))
 
+        print(f"h value = {utils.getHVal(filter, 0, fs, f1, f2)}")
+        print(f"w value = {utils.getWindowVal(window, 0, N)}")
         negativeVal = self.coeff[1:]
         negativeVal.reverse()
         self.coeff = negativeVal + self.coeff   
@@ -204,12 +208,12 @@ class Task7:
             self.signals[0].y = upsampled_signal
             self.signals[0].x = new_indices
 
-            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff)
+            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff, False)
 
 
         # sampling down
         if L == 0 and M != 0:
-            self.signals[0].x, self.signals[0].y = utils.calculate_convolution( self.indicies, self.coeff, signal.x, signal.y)
+            self.signals[0].x, self.signals[0].y = utils.calculate_convolution( self.indicies, self.coeff, signal.x, signal.y, False)
             
             n = int(len(self.signals[0].x[::M]))
             self.signals[0].x = [i for i in range(int(self.signals[0].x[0]), n - abs(int(self.signals[0].x[0])))]
@@ -228,7 +232,8 @@ class Task7:
             self.signals[0].x = new_indices
             self.signals[0].y = upsampled_signal
 
-            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff)
+            self.signals[0].x, self.signals[0].y = utils.calculate_convolution(self.signals[0].x, self.signals[0].y, self.indicies, self.coeff, False)
+        
             self.signals[0].y = self.signals[0].y[::M]
             n = int(len(self.signals[0].x[::M]))
             self.signals[0].x = [i for i in range(int(self.signals[0].x[0]), n - abs(int(self.signals[0].x[0])))]

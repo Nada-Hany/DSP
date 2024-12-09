@@ -188,20 +188,14 @@ def Compare_Signals(file_name,Your_indices,Your_samples):
                 expected_indices.append(V1)
                 expected_samples.append(V2)
                 line = f.readline()
-                print(f"line={line}")
-                print(f"if line={line.split(' ')}")
+
             else:
                 break
 
-    print(f"actual indicied = {expected_indices}\n")
-    print(f"actual samples = {expected_samples}")
-    print("\n")
     print("Current Output Test file is: ")
     print(file_name)
     print("\n")
     if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
-        print(f"actual sample length = {len(expected_samples)} --- actual indicies length = {len(expected_indices)}")
-        print(f"my sample length = {len(Your_samples)} --- my indicies length = {len(Your_indices)}")
         print("Test case failed, your signal have different length from the expected one")
         return
     for i in range(len(Your_indices)):

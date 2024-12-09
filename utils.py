@@ -171,7 +171,7 @@ def IDFT(signal, freq_domain):
 
 
 
-def calculate_convolution(x1, y1, x2, y2):
+def calculate_convolution(x1, y1, x2, y2, FIR = True):
     N1 = len(x1)
     N2 = len(x2)
 
@@ -184,10 +184,10 @@ def calculate_convolution(x1, y1, x2, y2):
         for j in range(N2):
             indices[i + j] = x1[i] + x2[j]
             result[i + j] += y1[i] * y2[j]
-
-    while result and result[-1] == 0:
-        result.pop()
-        indices.pop()
+    if not FIR:
+        while result and result[-1] == 0:
+            result.pop()
+            indices.pop()
         
     return indices, result
 

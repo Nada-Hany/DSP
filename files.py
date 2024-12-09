@@ -35,6 +35,14 @@ def writeOnFile_read(signal:ReadSignal, filename='output.txt'):
             tmp = round(y, 6)
             file.write(f'{x} {tmp}\n')
 
+
+def write_FIR_result(indicies, coeff, testCaseNumber):
+    filename = f'./files/task7/FIR/Testcase{testCaseNumber}/my_coefficients.txt'
+    with open(f"{filename}", "w") as file:
+        for x, y in zip(indicies, coeff):
+            file.write(f'{x} {y}\n')
+
+
 def readStructure(fileName):
     list = []
     file = open(fileName, "r")
