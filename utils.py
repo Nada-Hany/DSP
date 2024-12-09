@@ -184,6 +184,7 @@ def calculate_convolution(x1, y1, x2, y2, FIR = True):
         for j in range(N2):
             indices[i + j] = x1[i] + x2[j]
             result[i + j] += y1[i] * y2[j]
+            
     if not FIR:
         while result and result[-1] == 0:
             result.pop()

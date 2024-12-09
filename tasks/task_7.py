@@ -185,7 +185,7 @@ class Task7:
             signal = self.signals[0]
 
             test.Compare_Signals(f"{staticPath}{samplingPath}{self.testCaseNum}{fileName_sampling[self.testCaseNum]}",signal.x, signal.y)
-
+            self.graph.continousGraph(self.sampling_frame, self.indicies, self.coeff)
         else:
             noSignalError.place(x=200,y=200)
 
